@@ -15,7 +15,7 @@ html {
     min-height: 48px !important;
   }
   
-  /* 主体布局 - 用 flex  column */
+  /* 主体布局 */
   .main {
     flex-direction: column !important;
     height: auto !important;
@@ -31,9 +31,9 @@ html {
     overflow-y: auto !important;
   }
   
-  /* 输入区域 - 关键：底部留足够空间 */
+  /* 输入区域 - 大幅增加底部空间 */
   .input-area {
-    padding-bottom: 60px !important;
+    padding-bottom: 100px !important;
     min-height: 120px !important;
   }
   
@@ -43,13 +43,8 @@ html {
     min-height: 300px !important;
   }
   
-  /* 输入框 - 确保不被遮挡 */
-  #userInput {
-    margin-bottom: 50px !important;
-  }
-  
-  /* 缩放控件 - 上移 */
+  /* 缩放控件上移 */
   .zoom-controls {
-    bottom: 70px !important;
+    bottom: 110px !important;
   }
 }
