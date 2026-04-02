@@ -2,6 +2,20 @@
 /* ===== 移动端响应式增强 (新增) ===== */
 /* ================================================================ */
 
+/* 防止 iOS Safari 输入框自动放大 */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* 微信/飞书等 WebView 安全区域适配 */
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
 @media (max-width: 768px) {
   /* 整体布局调整 */
   .main { flex-direction: column; }
@@ -119,7 +133,8 @@
     gap: 4px;
   }
   .input-box textarea {
-    font-size: 14px; /* 防止 iOS 自动缩放 */
+    font-size: 16px; /* 防止 iOS 自动缩放（需要 >= 16px）*/
+    -webkit-text-size-adjust: 100%;
     padding: 8px 10px;
     min-height: 36px;
   }
