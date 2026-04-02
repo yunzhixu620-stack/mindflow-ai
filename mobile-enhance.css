@@ -8,41 +8,42 @@ html {
   text-size-adjust: 100%;
 }
 
-/* 微信/飞书等 WebView 安全区域适配 */
+/* 微信/飞书等 WebView 安全区域适配 - 强制适配所有情况 */
 @media (max-width: 768px) {
-  /* 整体容器添加安全区域 padding - 动态适配刘海屏 */
+  /* 整体容器 */
   .main {
-    padding-top: max(80px, env(safe-area-inset-top, 44px)) !important;
-    padding-bottom: max(80px, env(safe-area-inset-bottom, 50px)) !important;
-    height: calc(100vh - max(80px, env(safe-area-inset-top, 44px)) - max(80px, env(safe-area-inset-bottom, 50px))) !important;
-    min-height: calc(100vh - max(80px, env(safe-area-inset-top, 44px)) - max(80px, env(safe-area-inset-bottom, 50px))) !important;
+    padding-top: 80px !important;
+    padding-bottom: 80px !important;
+    height: auto !important;
+    min-height: calc(100vh - 160px) !important;
     box-sizing: border-box;
   }
   
-  /* 顶部导航固定定位 - 避开灵动岛 */
+  /* 顶部导航固定定位 */
   .topbar {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: max(80px, env(safe-area-inset-top, 44px)) !important;
+    height: 60px !important;
+    padding-top: 20px !important;
     z-index: 100;
   }
   
-  /* 侧边栏适配 */
+  /* 侧边栏 */
   .sidebar {
-    height: 100% !important;
-    padding-bottom: max(80px, env(safe-area-inset-bottom, 50px)) !important;
+    height: auto !important;
+    padding-bottom: 80px !important;
     box-sizing: border-box;
   }
   
-  /* 输入区域底部安全 */
+  /* 输入区域 */
   .input-area {
-    padding-bottom: max(80px, env(safe-area-inset-bottom, 50px)) !important;
+    padding-bottom: 80px !important;
     box-sizing: border-box;
   }
   
-  /* 导图区域适配 */
+  /* 导图区域 */
   .mindmap-area {
     height: 100% !important;
     box-sizing: border-box;
