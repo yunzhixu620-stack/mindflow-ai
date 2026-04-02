@@ -144,9 +144,9 @@
   /* ===== 主体布局 ===== */
   .main { display: flex; flex: 1; overflow: hidden; }
 
-  /* ===== 左侧面板 ===== */
+  /* ===== 左侧面板（对话+输入）===== */
   .sidebar {
-    width: 340px; min-width: 340px;
+    width: 320px; min-width: 280px; max-width: 380px;
     background: var(--bg-surface); border-right: 1px solid var(--border-subtle);
     display: flex; flex-direction: column; overflow: hidden;
   }
@@ -238,6 +238,46 @@
   .meeting-goal::placeholder { color: var(--text-muted); }
 
   .input-area { padding: 10px 14px; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* 右下角悬浮输入框（参考 MindGrow） */
+  .floating-input {
+    position: absolute; bottom: 20px; right: 20px;
+    width: 320px; max-width: calc(100% - 40px);
+    background: var(--bg-surface); border: 1px solid var(--border-default);
+    border-radius: 12px; padding: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    z-index: 50; display: none;
+  }
+  .floating-input.show { display: block; }
+  .floating-input textarea {
+    width: 100%; min-height: 60px; max-height: 120px;
+    background: var(--bg-base); border: 1px solid var(--border-subtle);
+    border-radius: 8px; padding: 10px 12px;
+    color: var(--text-primary); font-size: 13px; resize: none;
+    outline: none; font-family: inherit;
+  }
+  .floating-input textarea:focus { border-color: var(--accent); }
+  .floating-input-actions {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 8px;
+  }
+  .floating-input-actions .btn-send {
+    padding: 6px 16px; border-radius: 6px; border: none;
+    background: var(--accent); color: #fff; font-size: 12px;
+    cursor: pointer; display: flex; align-items: center; gap: 4px;
+  }
+  .floating-input-actions .btn-send:hover { background: var(--accent-hover); }
+  .floating-toggle {
+    position: absolute; bottom: 20px; right: 20px;
+    width: 48px; height: 48px;
+    background: var(--accent); border: none; border-radius: 50%;
+    color: #fff; cursor: pointer; display: none;
+    align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.4);
+    z-index: 49;
+  }
+  .floating-toggle.show { display: flex; }
+  .floating-toggle svg { width: 20px; height: 20px; }
   .chat-messages { flex: 1; overflow-y: auto; padding-right: 4px; margin-bottom: 10px; }
   .chat-messages::-webkit-scrollbar { width: 3px; }
   .chat-messages::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 3px; }
@@ -557,23 +597,22 @@
     font-weight: 600 !important;
     padding: 8px 18px !important;
     border-radius: 10px !important;
-    border: 2px solid !important;
-    background: var(--bg-elevated) !important;
-    color: var(--text-primary) !important;
+    border: none !important;
+    color: #fff !important;
     box-shadow: 0 2px 8px rgba(0,0,0,0.25) !important;
     line-height: 1.5 !important;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif !important;
     letter-spacing: -0.005em !important;
   }
-  /* 各分支颜色 */
-  jmnode.branch-0.level-1 { border-color: var(--branch-1) !important; color: var(--branch-1) !important; }
-  jmnode.branch-1.level-1 { border-color: var(--branch-2) !important; color: var(--branch-2) !important; }
-  jmnode.branch-2.level-1 { border-color: var(--branch-3) !important; color: var(--branch-3) !important; }
-  jmnode.branch-3.level-1 { border-color: var(--branch-4) !important; color: var(--branch-4) !important; }
-  jmnode.branch-4.level-1 { border-color: var(--branch-5) !important; color: var(--branch-5) !important; }
-  jmnode.branch-5.level-1 { border-color: var(--branch-6) !important; color: var(--branch-6) !important; }
+  /* 各分支颜色 - 填充背景 */
+  jmnode.branch-0.level-1 { background: var(--branch-1) !important; }
+  jmnode.branch-1.level-1 { background: var(--branch-2) !important; }
+  jmnode.branch-2.level-1 { background: var(--branch-3) !important; }
+  jmnode.branch-3.level-1 { background: var(--branch-4) !important; }
+  jmnode.branch-4.level-1 { background: var(--branch-5) !important; }
+  jmnode.branch-5.level-1 { background: var(--branch-6) !important; }
   jmnode.branch-6.level-1 { border-color: var(--branch-7) !important; color: var(--branch-7) !important; }
-  jmnode.branch-7.level-1 { border-color: var(--branch-8) !important; color: var(--branch-8) !important; }
+  jmnode.branch-7.level-1 { background: var(--branch-8) !important; }
 
   /* ---- 二级节点 ---- */
   jmnode.level-2 {
@@ -581,21 +620,21 @@
     font-weight: 500 !important;
     padding: 6px 14px !important;
     border-radius: 8px !important;
-    border: 1px solid var(--border-default) !important;
-    background: var(--bg-elevated) !important;
-    color: var(--text-secondary) !important;
+    border: none !important;
+    background: rgba(255,255,255,0.08) !important;
+    color: var(--text-primary) !important;
     box-shadow: 0 1px 4px rgba(0,0,0,0.15) !important;
     line-height: 1.5 !important;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif !important;
   }
-  jmnode.branch-0.level-2 { border-left: 3px solid var(--branch-1) !important; }
-  jmnode.branch-1.level-2 { border-left: 3px solid var(--branch-2) !important; }
-  jmnode.branch-2.level-2 { border-left: 3px solid var(--branch-3) !important; }
-  jmnode.branch-3.level-2 { border-left: 3px solid var(--branch-4) !important; }
-  jmnode.branch-4.level-2 { border-left: 3px solid var(--branch-5) !important; }
-  jmnode.branch-5.level-2 { border-left: 3px solid var(--branch-6) !important; }
-  jmnode.branch-6.level-2 { border-left: 3px solid var(--branch-7) !important; }
-  jmnode.branch-7.level-2 { border-left: 3px solid var(--branch-8) !important; }
+  jmnode.branch-0.level-2 { background: rgba(99,102,241,0.15) !important; }
+  jmnode.branch-1.level-2 { background: rgba(6,182,212,0.15) !important; }
+  jmnode.branch-2.level-2 { background: rgba(245,158,11,0.15) !important; }
+  jmnode.branch-3.level-2 { background: rgba(16,185,129,0.15) !important; }
+  jmnode.branch-4.level-2 { background: rgba(244,63,94,0.15) !important; }
+  jmnode.branch-5.level-2 { background: rgba(139,92,246,0.15) !important; }
+  jmnode.branch-6.level-2 { background: rgba(236,72,153,0.15) !important; }
+  jmnode.branch-7.level-2 { background: rgba(20,184,166,0.15) !important; }
 
   /* ---- 三级及更深节点 ---- */
   jmnode.level-3 {
@@ -871,6 +910,22 @@
 
   <!-- 右侧导图区域 -->
   <div class="mindmap-area" id="mindmapArea">
+    <!-- 右下角悬浮输入框 -->
+    <div class="floating-input" id="floatingInput">
+      <textarea id="floatingInputText" placeholder="输入内容，AI 自动生成导图..."></textarea>
+      <div class="floating-input-actions">
+        <button class="btn-icon" onclick="toggleVoiceInput()" title="语音输入" style="width:32px;height:32px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+        <button class="btn-send" onclick="submitFloatingInput()">发送</button>
+      </div>
+    </div>
+    
+    <!-- 悬浮切换按钮 -->
+    <button class="floating-toggle" id="floatingToggle" onclick="toggleFloatingInput()" title="输入">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </button>
+
     <div id="jsmind_container"></div>
 
     <!-- 布局切换按钮 -->
@@ -2216,6 +2271,44 @@ function loadLayoutSetting() {
     State.layoutDirection = 'right';
   }
 }
+
+// 悬浮输入框控制
+function toggleFloatingInput() {
+  const floatingInput = document.getElementById('floatingInput');
+  const floatingToggle = document.getElementById('floatingToggle');
+  const isShow = floatingInput.classList.toggle('show');
+  floatingToggle.classList.toggle('show', !isShow);
+  if (isShow) {
+    document.getElementById('floatingInputText').focus();
+  }
+}
+
+function submitFloatingInput() {
+  const text = document.getElementById('floatingInputText').value.trim();
+  if (!text) return;
+  
+  // 调用原有的提交逻辑
+  const inputField = document.getElementById('inputField');
+  if (inputField) {
+    inputField.value = text;
+    handleSubmit();
+    document.getElementById('floatingInputText').value = '';
+    toggleFloatingInput();
+  }
+}
+
+// 悬浮输入框 Enter 提交
+document.addEventListener('DOMContentLoaded', function() {
+  const floatingText = document.getElementById('floatingInputText');
+  if (floatingText) {
+    floatingText.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        submitFloatingInput();
+      }
+    });
+  }
+});
 
 function useTemplate(id) {
   const template = TEMPLATES.find(t => t.id === id);
