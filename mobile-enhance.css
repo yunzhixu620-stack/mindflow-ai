@@ -59,10 +59,10 @@ html {
     min-height: 120px !important;
   }
   
-  /* 输入框 - 底部固定定位 */
+  /* 输入框 - 底部固定定位 - 增加距离避开遮挡 */
   .input-box {
     position: fixed !important;
-    bottom: max(60px, env(safe-area-inset-bottom, 40px)) !important;
+    bottom: max(90px, env(safe-area-inset-bottom, 60px)) !important;
     left: 10px !important;
     right: 10px !important;
     z-index: 9998 !important;
@@ -83,7 +83,7 @@ html {
   /* 缩放控件 - 调整位置 */
   .zoom-controls {
     position: fixed !important;
-    bottom: max(120px, calc(env(safe-area-inset-bottom, 40px) + 80px)) !important;
+    bottom: max(150px, calc(env(safe-area-inset-bottom, 60px) + 110px)) !important;
     right: 15px !important;
     z-index: 9997 !important;
   }
@@ -91,7 +91,7 @@ html {
   /* 布局控制 */
   .layout-controls {
     position: fixed !important;
-    bottom: max(120px, calc(env(safe-area-inset-bottom, 40px) + 80px)) !important;
+    bottom: max(150px, calc(env(safe-area-inset-bottom, 60px) + 110px)) !important;
     left: 15px !important;
     z-index: 9997 !important;
   }
