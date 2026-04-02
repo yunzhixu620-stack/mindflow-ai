@@ -3038,6 +3038,26 @@ function renderMindmap(data) {
 
   // 渲染后给节点应用分支颜色的连线
   setTimeout(() => applyBranchLineColors(), 100);
+  
+  // 更新导图统计
+  updateMindmapStats(data);
+}
+
+// 更新导图统计信息
+function updateMindmapStats(data) {
+  if (!data) return;
+  let count = 1; // 根节点
+  function countNodes(node) {
+    if (node.children) {
+      node.children.forEach(child => {
+        count++;
+        countNodes(child);
+      });
+    }
+  }
+  countNodes(data);
+  // 可以选择显示这个统计，或者保存到历史记录中
+}
 
   State.jm.add_event_listener(function(type, node) {
     if (type === 'edit_end') {
