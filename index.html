@@ -959,7 +959,6 @@ const MINDFLOW_GIST_DESCRIPTION = 'MindFlow 思维导图数据';
 function checkAuth() {
   const token = localStorage.getItem('mindflow_github_token');
   if (!token) {
-    window.location.href = 'login.html';
     return null;
   }
   return token;
