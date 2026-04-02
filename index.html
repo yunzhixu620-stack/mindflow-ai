@@ -2142,8 +2142,8 @@ async function toggleVoice() {
     }
   } else {
     // 检查是否配置了 API 地址
-    const proxyUrl = document.getElementById('proxyUrl').value.trim();
-    if (!proxyUrl) {
+    const savedProxy = localStorage.getItem('mindflow_proxy');
+    if (!savedProxy) {
       showToast('请先点击右上角设置，配置 API 代理地址', 'error');
       toggleSettings();
       return;
