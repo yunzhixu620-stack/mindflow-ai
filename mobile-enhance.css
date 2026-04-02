@@ -10,19 +10,12 @@ html {
 
 /* 微信/飞书等 WebView 安全区域适配 */
 @media (max-width: 768px) {
-  /* iPhone 刘海屏额外适配 - 灵动岛 */
-  @supports (padding-top: env(safe-area-inset-top)) {
-    .topbar {
-      padding-top: max(12px, env(safe-area-inset-top)) !important;
-    }
-  }
-  
   /* 整体容器添加安全区域 padding - 动态适配刘海屏 */
   .main {
-    padding-top: max(60px, env(safe-area-inset-top, 44px)) !important;
-    padding-bottom: max(70px, env(safe-area-inset-bottom, 50px)) !important;
-    height: calc(100vh - max(60px, env(safe-area-inset-top, 44px)) - max(70px, env(safe-area-inset-bottom, 50px))) !important;
-    min-height: calc(100vh - max(60px, env(safe-area-inset-top, 44px)) - max(70px, env(safe-area-inset-bottom, 50px))) !important;
+    padding-top: max(80px, env(safe-area-inset-top, 44px)) !important;
+    padding-bottom: max(80px, env(safe-area-inset-bottom, 50px)) !important;
+    height: calc(100vh - max(80px, env(safe-area-inset-top, 44px)) - max(80px, env(safe-area-inset-bottom, 50px))) !important;
+    min-height: calc(100vh - max(80px, env(safe-area-inset-top, 44px)) - max(80px, env(safe-area-inset-bottom, 50px))) !important;
     box-sizing: border-box;
   }
   
@@ -32,20 +25,20 @@ html {
     top: 0;
     left: 0;
     right: 0;
-    height: max(56px, env(safe-area-inset-top, 44px)) !important;
+    height: max(80px, env(safe-area-inset-top, 44px)) !important;
     z-index: 100;
   }
   
   /* 侧边栏适配 */
   .sidebar {
     height: 100% !important;
-    padding-bottom: max(70px, env(safe-area-inset-bottom, 50px)) !important;
+    padding-bottom: max(80px, env(safe-area-inset-bottom, 50px)) !important;
     box-sizing: border-box;
   }
   
   /* 输入区域底部安全 */
   .input-area {
-    padding-bottom: max(70px, env(safe-area-inset-bottom, 50px)) !important;
+    padding-bottom: max(80px, env(safe-area-inset-bottom, 50px)) !important;
     box-sizing: border-box;
   }
   
