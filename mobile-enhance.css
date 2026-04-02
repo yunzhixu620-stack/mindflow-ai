@@ -31,9 +31,9 @@ html {
     overflow-y: auto !important;
   }
   
-  /* 输入区域 - 大幅增加底部空间 */
+  /* 输入区域 - 底部空间 */
   .input-area {
-    padding-bottom: 100px !important;
+    padding-bottom: 60px !important;
     min-height: 120px !important;
   }
   
@@ -45,6 +45,6 @@ html {
   
   /* 缩放控件上移 */
   .zoom-controls {
-    bottom: 110px !important;
+    bottom: 70px !important;
   }
 }
