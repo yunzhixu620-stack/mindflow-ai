@@ -802,6 +802,10 @@
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
           导出为 Freemind
         </div>
+        <div class="export-menu-item" onclick="copyMarkdown()">
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          复制 Markdown
+        </div>
       </div>
     </div>
     <div class="topbar-divider"></div>
@@ -2075,6 +2079,17 @@ function exportAs(type) {
     downloadText(fm, 'mindflow_' + getDateStr() + '.mm', 'text/xml');
     showToast('已导出 Freemind 格式');
   }
+}
+
+function copyMarkdown() {
+  document.getElementById('exportMenu').classList.remove('show');
+  if (!State.mindmapData) { showToast('没有可复制的导图', 'error'); return; }
+  const md = convertToMarkdown(State.mindmapData);
+  navigator.clipboard.writeText(md).then(() => {
+    showToast('已复制 Markdown 到剪贴板', 'success');
+  }).catch(() => {
+    showToast('复制失败，请手动复制');
+  });
 }
 
 function convertToMarkdown(node, depth) {
