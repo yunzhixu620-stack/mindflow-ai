@@ -9,11 +9,28 @@ html {
 }
 
 /* 微信/飞书等 WebView 安全区域适配 */
-body {
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
+@media (max-width: 768px) {
+  body {
+    /* 固定 padding 适配主流 WebView */
+    padding-top: 44px; /* 飞书/微信顶部栏高度 */
+    padding-bottom: 50px; /* 飞书/微信底部栏高度 */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  
+  /* 顶部导航适配 */
+  .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+  }
+  
+  /* 侧边栏输入区域适配 */
+  .sidebar {
+    padding-bottom: 60px; /* 底部安全区域 */
+  }
 }
 
 @media (max-width: 768px) {
