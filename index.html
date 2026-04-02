@@ -1396,6 +1396,14 @@ function loadHistoryItem(id) {
   const item = list.find(h => h.id === id);
   if (!item) return;
 
+  // 关闭所有弹窗和面板，防止重叠
+  document.getElementById('exportMenu').classList.remove('show');
+  document.getElementById('sparkPanel').classList.remove('show');
+  document.getElementById('templateOverlay').style.display = 'none';
+  document.getElementById('settingsOverlay').classList.remove('show');
+  document.getElementById('settingsModal').classList.remove('show');
+  document.getElementById('nodeContextMenu').style.display = 'none';
+
   const modeTabMap = { meeting: 0, knowledge: 1, article: 2 };
   const tabs = document.querySelectorAll('.mode-tab');
   tabs.forEach(t => t.classList.remove('active'));
