@@ -759,6 +759,10 @@
         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
       </svg>
     </button>
+    <div class="topbar-divider"></div>
+    <button class="btn-icon" id="userAvatarBtn" onclick="logout()" title="退出登录" style="display:none">
+      <div style="width:20px;height:20px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;" id="userAvatarIcon">?</div>
+    </button>
   </div>
 </div>
 
@@ -949,6 +953,109 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ==================== GitHub Gist 同步 ====================
+const GITHUB_API = 'https://api.github.com';
+const MINDFLOW_GIST_DESCRIPTION = 'MindFlow 思维导图数据';
+
+function checkAuth() {
+  const token = localStorage.getItem('mindflow_github_token');
+  if (!token) {
+    window.location.href = 'login.html';
+    return null;
+  }
+  return token;
+}
+
+async function getMindFlowGists() {
+  const token = checkAuth();
+  if (!token) return [];
+
+  try {
+    const res = await fetch(GITHUB_API + '/gists', {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    if (!res.ok) return [];
+    const gists = await res.json();
+    return gists.filter(g => g.description && g.description.includes('MindFlow'));
+  } catch (e) {
+    console.error('获取 Gist 失败:', e);
+    return [];
+  }
+}
+
+async function saveToGist(title, data) {
+  const token = checkAuth();
+  if (!token) return null;
+
+  const existingGists = await getMindFlowGists();
+  const gistFileName = title.replace(/[^a-zA-Z0-9]/g, '_') + '.json';
+  const gist = existingGists.find(g => g.files && g.files[gistFileName]);
+
+  const payload = {
+    description: MINDFLOW_GIST_DESCRIPTION + ' - ' + title,
+    public: false,
+    files: {
+      [gistFileName]: {
+        content: JSON.stringify({ title, data, updatedAt: new Date().toISOString() })
+      }
+    }
+  };
+
+  try {
+    const url = gist ? GITHUB_API + '/gists/' + gist.id : GITHUB_API + '/gists';
+    const method = gist ? 'PATCH' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('保存失败');
+    return await res.json();
+  } catch (e) {
+    console.error('保存 Gist 失败:', e);
+    return null;
+  }
+}
+
+async function loadFromGist(gistId) {
+  const token = checkAuth();
+  if (!token) return null;
+
+  try {
+    const res = await fetch(GITHUB_API + '/gists/' + gistId, {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    if (!res.ok) return null;
+    const gist = await res.json();
+    const file = Object.values(gist.files)[0];
+    return JSON.parse(file.content);
+  } catch (e) {
+    console.error('加载 Gist 失败:', e);
+    return null;
+  }
+}
+
+function logout() {
+  localStorage.removeItem('mindflow_github_token');
+  window.location.href = 'login.html';
+}
+
+// 页面加载时检查登录
+if (!localStorage.getItem('mindflow_github_token')) {
+  // 不阻止加载，但提示需要登录
+  console.log('未登录，部分功能可能受限');
+}
+
 // ==================== 全局状态 ====================
 const State = {
   mode: 'meeting',
@@ -1000,6 +1107,23 @@ const BRANCH_COLORS = [
 
 // ==================== 初始化 ====================
 function init() {
+  // 检查 GitHub 登录状态
+  const token = localStorage.getItem('mindflow_github_token');
+  if (token) {
+    fetch(GITHUB_API + '/user', {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    }).then(res => res.json()).then(user => {
+      if (user.login) {
+        const btn = document.getElementById('userAvatarBtn');
+        document.getElementById('userAvatarIcon').textContent = user.login.charAt(0).toUpperCase();
+        btn.style.display = 'flex';
+      }
+    }).catch(() => {});
+  }
+
   const savedApiKey = localStorage.getItem('mindflow_apikey');
   const savedProxy = localStorage.getItem('mindflow_proxy');
   const savedModel = localStorage.getItem('mindflow_model');
@@ -1110,7 +1234,7 @@ function saveHistory(list, mode) {
   localStorage.setItem(key, JSON.stringify(list));
 }
 
-function saveCurrentToHistory(title) {
+async function saveCurrentToHistory(title) {
   if (!State.mindmapData) return;
   const list = getHistory(State.mode);
   const item = {
@@ -1134,6 +1258,15 @@ function saveCurrentToHistory(title) {
   State.currentHistoryId = item.id;
   saveHistory(list, State.mode);
   renderHistoryList();
+
+  // 同步到 GitHub Gist
+  const token = localStorage.getItem('mindflow_github_token');
+  if (token && item.title) {
+    const gistId = await saveToGist(item.title, item);
+    if (gistId) {
+      showToast('已同步到 GitHub ☁️', 'success');
+    }
+  }
 }
 
 function renderHistoryList() {
