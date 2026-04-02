@@ -873,6 +873,16 @@
   <div class="mindmap-area" id="mindmapArea">
     <div id="jsmind_container"></div>
 
+    <!-- 布局切换按钮 -->
+    <div class="layout-controls" id="layoutControls">
+      <button class="layout-btn active" id="layoutRightBtn" onclick="setLayoutDirection('right')" title="横向布局">
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+      <button class="layout-btn" id="layoutBottomBtn" onclick="setLayoutDirection('bottom')" title="纵向布局">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="5 12 12 19 19 12"/></svg>
+      </button>
+    </div>
+
     <!-- 空状态引导 -->
     <div class="mindmap-placeholder" id="placeholder">
       <div class="placeholder-icon">
@@ -1151,6 +1161,7 @@ function init() {
   renderHistoryList();
   updatePlaceholderExamples('meeting');
   setupMindmapInteraction();
+  loadLayoutSetting(); // 加载布局设置
   
   document.addEventListener('click', function(e) {
     const menu = document.getElementById('exportMenu');
@@ -2144,6 +2155,68 @@ function closeTemplates(event) {
   document.getElementById('templateOverlay').style.display = 'none';
 }
 
+// 布局方向切换
+function setLayoutDirection(direction) {
+  // 更新按钮状态
+  document.getElementById('layoutRightBtn').classList.toggle('active', direction === 'right');
+  document.getElementById('layoutBottomBtn').classList.toggle('active', direction === 'bottom');
+  
+  // 保存设置
+  State.layoutDirection = direction;
+  localStorage.setItem('mindflow_layout', direction);
+  
+  if (!State.jm || !State.mindmapData) {
+    showToast('暂无导图数据', 'error');
+    return;
+  }
+  
+  // 重新初始化 jsMind 并应用新布局
+  const container = document.getElementById('jsmind_container');
+  container.innerHTML = '';
+  
+  const options = {
+    container: 'jsmind_container',
+    editable: true,
+    theme: 'primary',
+    view: { 
+      engine: 'canvas', 
+      hmargin: 120,
+      vmargin: 60,
+      line_width: 2,
+      line_color: 'rgba(255,255,255,0.06)',
+    },
+    layout: { 
+      hspace: 40,
+      vspace: 24,
+      pspace: 16,
+      direction: direction, // 关键：设置布局方向
+    },
+  };
+  
+  State.jm = new jsMind(options);
+  State.jm.show(State.mindmapData);
+  
+  // 重新应用缩放
+  State.jm.zoom(State.zoomScale || 1.0);
+  
+  // 重新着色
+  setTimeout(() => applyBranchLineColors(), 100);
+  
+  showToast(direction === 'right' ? '已切换为横向布局' : '已切换为纵向布局');
+}
+
+// 加载保存的布局设置
+function loadLayoutSetting() {
+  const saved = localStorage.getItem('mindflow_layout');
+  if (saved) {
+    State.layoutDirection = saved;
+    document.getElementById('layoutRightBtn').classList.toggle('active', saved === 'right');
+    document.getElementById('layoutBottomBtn').classList.toggle('active', saved === 'bottom');
+  } else {
+    State.layoutDirection = 'right';
+  }
+}
+
 function useTemplate(id) {
   const template = TEMPLATES.find(t => t.id === id);
   if (!template) return;
@@ -2771,6 +2844,7 @@ function renderMindmap(data) {
       hspace: 40,     // 水平间距加大 - 呼吸感
       vspace: 24,     // 垂直间距加大
       pspace: 16,     // 父子节点间距加大
+      direction: State.layoutDirection || 'right', // 布局方向：right=横向，bottom=纵向
     },
   });
   State.jm.show(mindData);
