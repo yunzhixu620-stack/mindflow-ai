@@ -2438,7 +2438,10 @@ function switchMode(mode, el, noReset) {
   // 更新空状态示例
   updatePlaceholderExamples(mode);
 
-  if (!noReset) showToast('已切换到' + title.textContent);
+  if (!noReset) {
+    const modeEmoji = { meeting: '🎯', knowledge: '💡', article: '📄' };
+    showToast(modeEmoji[mode] + ' 已切换到' + title.textContent);
+  }
 }
 
 // 更新空状态示例
