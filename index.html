@@ -876,23 +876,8 @@
         </svg>
       </div>
       <h4>开始创建思维导图</h4>
-      <p>在左侧输入内容，AI 会自动生成<br>结构化的思维导图</p>
-      <div class="placeholder-tips" id="placeholderTips">
-        <div class="placeholder-tip" onclick="fillExample('meeting')">
-          <span class="placeholder-tip-icon">🎯</span>
-          <div class="placeholder-tip-text">
-            <strong>会议助手 — 试试这个</strong>
-            今天讨论了 Q2 目标，提升 DAU 30%，负责人张三；确定了新功能上线时间表
-          </div>
-        </div>
-        <div class="placeholder-tip" onclick="fillExample('knowledge')">
-          <span class="placeholder-tip-icon">💡</span>
-          <div class="placeholder-tip-text">
-            <strong>知识碎片 — 试试这个</strong>
-            费曼学习法：用简单语言解释概念；番茄工作法：25分钟专注+5分钟休息
-          </div>
-        </div>
-      </div>
+      <p id="placeholderDesc">在左侧输入内容，AI 会自动生成<br>结构化的思维导图</p>
+      <div class="placeholder-tips" id="placeholderTips"></div>
     </div>
 
     <!-- 缩放控件 -->
@@ -1146,6 +1131,7 @@ function init() {
   if (savedModel) document.getElementById('modelSelect').value = savedModel;
 
   renderHistoryList();
+  updatePlaceholderExamples('meeting');
   setupMindmapInteraction();
   
   document.addEventListener('click', function(e) {
@@ -1994,6 +1980,7 @@ function fillExample(mode) {
   const examples = {
     meeting: '今天讨论了 Q2 目标，提升 DAU 30%，负责人张三，截止 6 月 30 日；确定了新功能上线时间表，A 功能 4 月 15 日，B 功能 5 月 1 日；技术债务清理需要额外 2 周，已批准',
     knowledge: '费曼学习法：用简单语言解释概念，能讲清楚才算真的懂；番茄工作法：25 分钟专注 + 5 分钟休息，四个番茄后长休息 15-30 分钟；GTD：收集、明确、组织、回顾、行动五步骤',
+    article: '在知识爆炸的时代，如何高效学习成为每个人的必修课。本文通过分析认知科学原理，提出「深度学习」的概念——不仅仅是信息的获取，更是知识的内化与应用。作者认为，传统的碎片化学习虽然看似高效，却难以形成真正的知识体系，而系统性的深度学习虽然前期投入较大，但长期收益远超前者。",
   };
   
   const tabs = document.querySelectorAll('.mode-tab');
@@ -2080,7 +2067,50 @@ function switchMode(mode, el, noReset) {
   // 切换模式时刷新历史记录列表
   renderHistoryList();
 
+  // 更新空状态示例
+  updatePlaceholderExamples(mode);
+
   if (!noReset) showToast('已切换到' + title.textContent);
+}
+
+// 更新空状态示例
+function updatePlaceholderExamples(mode) {
+  const container = document.getElementById('placeholderTips');
+  const desc = document.getElementById('placeholderDesc');
+  
+  const examples = {
+    meeting: {
+      desc: '在左侧输入内容，AI 会自动生成<br>结构化的思维导图',
+      tips: [
+        { icon: '🎯', title: '会议助手 — 试试这个', text: '今天讨论了 Q2 目标，提升 DAU 30%，负责人张三；确定了新功能上线时间表' }
+      ]
+    },
+    knowledge: {
+      desc: '输入零散的知识点和灵感，AI 自动整合<br>成结构化的知识体系',
+      tips: [
+        { icon: '💡', title: '知识碎片 — 试试这个', text: '费曼学习法：用简单语言解释概念；番茄工作法：25分钟专注+5分钟休息；康奈尔笔记法：记录-简化-背诵-复习' }
+      ]
+    },
+    article: {
+      desc: '粘贴文章内容，AI 提取核心论点<br>和逻辑链条',
+      tips: [
+        { icon: '📄', title: '文章解析 — 试试这个', text: '粘贴一段文章或论文，AI 将提取核心论点和论证逻辑' }
+      ]
+    }
+  };
+  
+  const data = examples[mode] || examples.meeting;
+  desc.innerHTML = data.desc;
+  
+  container.innerHTML = data.tips.map(tip => `
+    <div class="placeholder-tip" onclick="fillExample('${mode}')">
+      <span class="placeholder-tip-icon">${tip.icon}</span>
+      <div class="placeholder-tip-text">
+        <strong>${tip.title}</strong>
+        ${tip.text}
+      </div>
+    </div>
+  `).join('');
 }
 
 // ==================== 会议类型 ====================
@@ -2095,6 +2125,10 @@ function setMeetingType(type, el) {
   } else {
     goalInput.classList.remove('show');
     document.getElementById('sparkPanel').classList.remove('show');
+  }
+  // 切换会议类型时，如果有导图则清空（用户想重新开始）
+  if (State.mindmapData) {
+    goBack();
   }
   if (type === 'brainstorm' && goalInput.value.trim()) generateMeetingFramework(goalInput.value.trim());
 }
