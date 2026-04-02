@@ -805,6 +805,13 @@
       </div>
     </div>
     <div class="topbar-divider"></div>
+    <button class="btn-icon" onclick="showHelp()" title="帮助">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </button>
     <button class="btn-icon" onclick="toggleSettings()" title="设置">
       <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"/>
@@ -2360,6 +2367,37 @@ function fillExample(mode) {
   document.getElementById('userInput').value = examples[mode] || '';
   autoResize(document.getElementById('userInput'));
   document.getElementById('userInput').focus();
+}
+
+// ==================== 帮助 ====================
+function showHelp() {
+  const helpContent = `
+    <div style="max-width:400px;padding:20px">
+      <h3 style="margin:0 0 16px;font-size:18px">⌨️ 快捷键</h3>
+      <div style="display:grid;gap:8px;font-size:13px;line-height:1.8">
+        <div><kbd style="background:#333;padding:2px 6px;border-radius:4px;border:1px solid #555">Ctrl+S</kbd> 保存导图</div>
+        <div><kbd style="background:#333;padding:2px 6px;border-radius:4px;border:1px solid #555">Ctrl+Z</kbd> 撤销</div>
+        <div><kbd style="background:#333;padding:2px 6px;border-radius:4px;border:1px solid #555">Ctrl+C</kbd> 复制节点</div>
+        <div><kbd style="background:#333;padding:2px 6px;border-radius:4px;border:1px solid #555">Ctrl+V</kbd> 粘贴节点</div>
+        <div><kbd style="background:#333;padding:2px 6px;border-radius:4px;border:1px solid #555">Tab</kbd> 添加子节点</div>
+        <div><kbd style="background:#333;padding:2px 6px;border-radius:4px;border:1px solid #555">Enter</kbd> 添加同级节点</div>
+        <div><kbd style="background:#333;padding:2px 6px;border-radius:4px;border:1px solid #555">Delete</kbd> 删除节点</div>
+      </div>
+      <h3 style="margin:24px 0 12px;font-size:16px">💡 使用提示</h3>
+      <ul style="margin:0;padding-left:20px;font-size:13px;line-height:1.8;color:#aaa">
+        <li>点击顶部标签切换模式</li>
+        <li>输入内容后 AI 自动生成导图</li>
+        <li>双击节点可直接编辑</li>
+        <li>拖拽画布移动视图</li>
+        <li>滚轮缩放大小</li>
+      </ul>
+    </div>
+  `;
+  const overlay = document.getElementById('settingsOverlay');
+  const modal = document.getElementById('settingsModal');
+  modal.innerHTML = '<button onclick="toggleSettings()" style="position:absolute;top:12px;right:12px;background:none;border:none;color:#fff;cursor:pointer;font-size:20px">×</button>' + helpContent;
+  overlay.classList.add('show');
+  modal.classList.add('show');
 }
 
 // ==================== 设置 ====================
