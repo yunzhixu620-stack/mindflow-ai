@@ -755,6 +755,10 @@
           <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
           导出为 JSON
         </div>
+        <div class="export-menu-item" onclick="exportAs('freemind')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          导出为 Freemind
+        </div>
       </div>
     </div>
     <div class="topbar-divider"></div>
@@ -1541,6 +1545,18 @@ function setupMindmapInteraction() {
       return;
     }
 
+    // Ctrl+S / Cmd+S — 保存当前导图
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      if (State.mindmapData) {
+        saveCurrentToHistory(State.mindmapData.topic || '未命名');
+        showToast('已保存', 'success');
+      } else {
+        showToast('没有可保存的内容');
+      }
+      return;
+    }
+
     // Tab — 添加子节点
     if (e.key === 'Tab' && selected) {
       e.preventDefault();
@@ -1935,6 +1951,10 @@ function exportAs(type) {
     showToast('已导出 Markdown');
   } else if (type === 'png') {
     exportToPng();
+  } else if (type === 'freemind') {
+    const fm = convertToFreemind(State.mindmapData);
+    downloadText(fm, 'mindflow_' + getDateStr() + '.mm', 'text/xml');
+    showToast('已导出 Freemind 格式');
   }
 }
 
@@ -1946,6 +1966,30 @@ function convertToMarkdown(node, depth) {
     node.children.forEach(child => { md += convertToMarkdown(child, depth + 1); });
   }
   return md;
+}
+
+function convertToFreemind(node) {
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  xml += '<map version="1.0.1">\n';
+  xml += nodeToFreemind(node, 0);
+  xml += '</map>';
+  return xml;
+}
+
+function nodeToFreemind(node, depth) {
+  const indent = '  '.repeat(depth);
+  let xml = indent + '<node TEXT="' + escapeXml(node.topic || '') + '">\n';
+  if (node.children && node.children.length > 0) {
+    node.children.forEach(child => {
+      xml += nodeToFreemind(child, depth + 1);
+    });
+  }
+  xml += indent + '</node>\n';
+  return xml;
+}
+
+function escapeXml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function exportToPng() {
