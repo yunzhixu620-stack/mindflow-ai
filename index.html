@@ -1222,6 +1222,15 @@ function init() {
   setupMindmapInteraction();
   loadLayoutSetting(); // 加载布局设置
   
+  // 首次使用提示
+  const firstVisit = !localStorage.getItem('mindflow_visited');
+  if (firstVisit) {
+    localStorage.setItem('mindflow_visited', 'true');
+    setTimeout(() => {
+      showToast('💡 提示：点击顶部切换模式，左侧输入内容 AI 自动生成导图', 'success');
+    }, 1000);
+  }
+  
   document.addEventListener('click', function(e) {
     const menu = document.getElementById('exportMenu');
     if (!e.target.closest('.export-wrapper')) {
