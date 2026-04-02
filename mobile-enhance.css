@@ -2,103 +2,46 @@
 /* ===== 移动端响应式增强 ===== */
 /* ================================================================ */
 
-/* 防止 iOS Safari 输入框自动放大 */
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
 
-/* ================================================================ */
-/* ===== 手机端核心适配（微信/飞书/刘海屏） ===== */
-/* ================================================================ */
-@media screen and (max-width: 768px) {
-  html, body {
-    height: 100%;
-    overflow: hidden;
-  }
-  
-  /* 顶部导航 - 固定在顶部 */
+/* 手机端简单适配 - 不破坏原有布局 */
+@media (max-width: 768px) {
+  /* 顶部避开刘海 */
   .topbar {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 60px !important;
-    z-index: 9999 !important;
-    background: var(--bg-surface) !important;
-    border-bottom: 1px solid var(--border-subtle) !important;
+    height: 50px !important;
+    min-height: 50px !important;
   }
   
-  /* 主内容区 */
-  .main {
-    position: relative !important;
-    margin-top: 60px !important;
-    padding-top: 20px !important;
-    padding-bottom: 150px !important;
-    height: calc(100% - 60px) !important;
-    min-height: auto !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-  
-  /* 侧边栏 */
+  /* 侧边栏留出底部空间给输入框 */
   .sidebar {
-    position: relative !important;
-    width: 100% !important;
-    height: 50% !important;
-    min-height: 200px !important;
-    padding-bottom: 150px !important;
-    box-sizing: border-box !important;
+    padding-bottom: 30px !important;
   }
   
-  /* 输入区域 */
+  /* 输入框区域增加底部安全距离 */
   .input-area {
-    position: relative !important;
-    padding-bottom: 150px !important;
-    min-height: 120px !important;
+    padding-bottom: 30px !important;
+    min-height: 100px !important;
   }
   
-  /* 输入框 - 底部固定定位，大幅增加距离 */
+  /* 输入框加大 */
   .input-box {
-    position: fixed !important;
-    bottom: 120px !important;
-    left: 10px !important;
-    right: 10px !important;
-    z-index: 9998 !important;
-    background: var(--bg-surface) !important;
-    padding: 10px !important;
-    border-radius: 12px !important;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.3) !important;
+    margin-bottom: 10px !important;
   }
   
   /* 导图区域 */
   .mindmap-area {
-    position: relative !important;
-    height: 50% !important;
     min-height: 200px !important;
-    box-sizing: border-box !important;
   }
   
-  /* 缩放控件 */
-  .zoom-controls {
-    position: fixed !important;
-    bottom: 180px !important;
-    right: 15px !important;
-    z-index: 9997 !important;
-  }
-  
-  /* 布局控制 */
+  /* 隐藏一些不必要的元素减少干扰 */
   .layout-controls {
-    position: fixed !important;
-    bottom: 180px !important;
-    left: 15px !important;
-    z-index: 9997 !important;
+    bottom: 80px !important;
   }
   
-  /* 历史记录 */
-  .history-section {
-    max-height: 100px !important;
-    overflow-y: auto !important;
+  .zoom-controls {
+    bottom: 80px !important;
   }
 }
