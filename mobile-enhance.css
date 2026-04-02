@@ -17,7 +17,7 @@ html {
     overflow: hidden;
   }
   
-  /* 顶部导航 - 固定在顶部，避开刘海 */
+  /* 顶部导航 - 固定在顶部 */
   .topbar {
     position: fixed !important;
     top: 0 !important;
@@ -29,12 +29,12 @@ html {
     border-bottom: 1px solid var(--border-subtle) !important;
   }
   
-  /* 主内容区 - 使用 margin 避开顶部导航 */
+  /* 主内容区 */
   .main {
     position: relative !important;
     margin-top: 60px !important;
     padding-top: 20px !important;
-    padding-bottom: 100px !important;
+    padding-bottom: 150px !important;
     height: calc(100% - 60px) !important;
     min-height: auto !important;
     box-sizing: border-box !important;
@@ -48,21 +48,21 @@ html {
     width: 100% !important;
     height: 50% !important;
     min-height: 200px !important;
-    padding-bottom: 80px !important;
+    padding-bottom: 150px !important;
     box-sizing: border-box !important;
   }
   
   /* 输入区域 */
   .input-area {
     position: relative !important;
-    padding-bottom: 100px !important;
+    padding-bottom: 150px !important;
     min-height: 120px !important;
   }
   
-  /* 输入框 - 底部固定定位 - 增加距离避开遮挡 */
+  /* 输入框 - 底部固定定位，大幅增加距离 */
   .input-box {
     position: fixed !important;
-    bottom: max(90px, env(safe-area-inset-bottom, 60px)) !important;
+    bottom: 120px !important;
     left: 10px !important;
     right: 10px !important;
     z-index: 9998 !important;
@@ -80,10 +80,10 @@ html {
     box-sizing: border-box !important;
   }
   
-  /* 缩放控件 - 调整位置 */
+  /* 缩放控件 */
   .zoom-controls {
     position: fixed !important;
-    bottom: max(150px, calc(env(safe-area-inset-bottom, 60px) + 110px)) !important;
+    bottom: 180px !important;
     right: 15px !important;
     z-index: 9997 !important;
   }
@@ -91,37 +91,14 @@ html {
   /* 布局控制 */
   .layout-controls {
     position: fixed !important;
-    bottom: max(150px, calc(env(safe-area-inset-bottom, 60px) + 110px)) !important;
+    bottom: 180px !important;
     left: 15px !important;
     z-index: 9997 !important;
   }
   
-  /* 历史记录限制高度 */
+  /* 历史记录 */
   .history-section {
     max-height: 100px !important;
     overflow-y: auto !important;
-  }
-  
-  /* 隐藏空状态 */
-  .mindmap-placeholder {
-    display: none !important;
-  }
-  
-  /* 隐藏模板按钮 */
-  .template-btn {
-    display: none !important;
-  }
-}
-
-/* 超小屏幕额外适配 */
-@media screen and (max-width: 375px) {
-  .topbar {
-    height: 50px !important;
-  }
-  .main {
-    margin-top: 50px !important;
-  }
-  .input-box {
-    padding: 8px !important;
   }
 }
