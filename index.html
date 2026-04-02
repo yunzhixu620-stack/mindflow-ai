@@ -1238,6 +1238,30 @@ function init() {
     }, 1000);
   }
   
+  // 自动保存：每60秒自动保存当前导图
+  setInterval(() => {
+    if (State.mindmapData && State.mindmapData.topic) {
+      localStorage.setItem('mindflow_autosave', JSON.stringify(State.mindmapData));
+    }
+  }, 60000);
+  
+  // 检查自动保存并提示恢复
+  const autosave = localStorage.getItem('mindflow_autosave');
+  if (autosave) {
+    try {
+      const data = JSON.parse(autosave);
+      if (data && data.topic) {
+        setTimeout(() => {
+          if (confirm('发现未保存的导图，是否恢复？\n主题：' + data.topic)) {
+            renderMindmap(data);
+            showToast('已恢复自动保存的导图', 'success');
+          }
+          localStorage.removeItem('mindflow_autosave');
+        }, 1500);
+      }
+    } catch(e) {}
+  }
+  
   document.addEventListener('click', function(e) {
     const menu = document.getElementById('exportMenu');
     if (!e.target.closest('.export-wrapper')) {
