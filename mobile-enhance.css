@@ -10,26 +10,42 @@ html {
 
 /* 微信/飞书等 WebView 安全区域适配 */
 @media (max-width: 768px) {
-  body {
-    /* 固定 padding 适配主流 WebView */
-    padding-top: 44px; /* 飞书/微信顶部栏高度 */
-    padding-bottom: 50px; /* 飞书/微信底部栏高度 */
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
+  /* 整体容器添加安全区域 padding */
+  .main {
+    padding-top: 44px !important; /* 飞书/微信顶部栏高度 */
+    padding-bottom: 60px !important; /* 飞书/微信底部栏高度 */
+    height: calc(100vh - 44px - 60px) !important;
+    min-height: calc(100vh - 44px - 60px) !important;
+    box-sizing: border-box;
   }
   
-  /* 顶部导航适配 */
+  /* 顶部导航固定定位 */
   .topbar {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
+    height: 44px;
     z-index: 100;
   }
   
-  /* 侧边栏输入区域适配 */
+  /* 侧边栏适配 */
   .sidebar {
-    padding-bottom: 60px; /* 底部安全区域 */
+    height: 100% !important;
+    padding-bottom: 60px !important;
+    box-sizing: border-box;
+  }
+  
+  /* 输入区域底部安全 */
+  .input-area {
+    padding-bottom: 60px !important;
+    box-sizing: border-box;
+  }
+  
+  /* 导图区域适配 */
+  .mindmap-area {
+    height: 100% !important;
+    box-sizing: border-box;
   }
 }
 
