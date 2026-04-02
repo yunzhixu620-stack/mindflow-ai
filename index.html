@@ -672,6 +672,13 @@
     .sidebar { width: 100%; min-width: auto; height: 50%; }
     .main { flex-direction: column; }
     .mindmap-area { height: 50%; }
+    .topbar { padding: 0 8px; }
+    .topbar-left { gap: 8px; }
+    .topbar-right { gap: 0; }
+    .mode-tabs { display: none; }
+    .topbar .logo { font-size: 13px; }
+    .btn-icon { width: 28px; height: 28px; }
+    .topbar-divider { display: none; }
   }
 </style>
 </head>
@@ -2134,6 +2141,14 @@ async function toggleVoice() {
       State.transcript = '';
     }
   } else {
+    // 检查是否配置了 API 地址
+    const proxyUrl = document.getElementById('proxyUrl').value.trim();
+    if (!proxyUrl) {
+      showToast('请先点击右上角设置，配置 API 代理地址', 'error');
+      toggleSettings();
+      return;
+    }
+
     // 开始录音
     try {
       await startASR();
@@ -2142,7 +2157,15 @@ async function toggleVoice() {
       btn.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
       waveform.classList.add('active');
     } catch (e) {
-      showToast('启动语音识别失败：' + e.message, 'error');
+      let msg = e.message;
+      if (msg.includes('NotAllowed') || msg.includes('Permission')) {
+        msg = '请允许浏览器访问麦克风';
+      } else if (msg.includes('NotFound') || msg.includes('NotFoundError')) {
+        msg = '未找到麦克风设备';
+      } else if (msg.includes('Connection') || msg.includes('fetch')) {
+        msg = '网络连接失败，请检查设置中的 API 地址';
+      }
+      showToast('语音识别失败：' + msg, 'error');
       console.error(e);
     }
   }
