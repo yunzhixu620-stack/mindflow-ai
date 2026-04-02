@@ -675,7 +675,8 @@
     .topbar { padding: 0 8px; }
     .topbar-left { gap: 8px; }
     .topbar-right { gap: 0; }
-    .mode-tabs { display: none; }
+    .mode-tabs { display: flex; overflow-x: auto; padding: 4px; }
+    .mode-tab { padding: 6px 10px; font-size: 11px; }
     .topbar .logo { font-size: 13px; }
     .btn-icon { width: 28px; height: 28px; }
     .topbar-divider { display: none; }
@@ -758,6 +759,12 @@
       <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"/>
         <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+    </button>
+    <button class="btn-icon" id="backBtn" onclick="goBack()" title="返回" style="display:none">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"/>
+        <polyline points="12 19 5 12 12 5"/>
       </svg>
     </button>
     <button class="btn-icon" onclick="clearAll()" title="清空当前">
@@ -2172,8 +2179,22 @@ async function toggleVoice() {
 }
 
 async function startASR() {
+  // 先请求麦克风权限
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (e) {
+    let msg = '无法访问麦克风';
+    if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
+      msg = '请允许浏览器访问麦克风';
+    } else if (e.name === 'NotFoundError' || e.name === 'DevicesNotFoundError') {
+      msg = '未找到麦克风设备';
+    }
+    throw new Error(msg);
+  }
+
   // 连接 WebSocket
-  const wsUrl = FC_PROXY + ASR_WS_PATH;
+  const savedProxy = localStorage.getItem('mindflow_proxy');
+  const wsUrl = savedProxy + ASR_WS_PATH;
   ws = new WebSocket(wsUrl);
   ws.binaryType = 'arraybuffer';
 
@@ -2549,6 +2570,9 @@ function renderMindmap(data) {
       // 用户手动编辑后同步数据
     }
   });
+
+  // 更新返回按钮
+  updateBackButton();
 }
 
 // 给不同分支的连线着色（通过 canvas 绘制后处理）
@@ -2573,7 +2597,12 @@ function applyBranchLineColors() {
 // ==================== 清空 ====================
 function clearAll() {
   if (!confirm('清空当前内容？历史记录不会删除，可以随时恢复。')) return;
-  State.mindmapData = null; State.chatHistory = []; State.transcript = ''; State.currentHistoryId = null;
+  goBack();
+}
+
+function goBack() {
+  // 返回并显示空状态
+  State.mindmapData = null; State.chatHistory = []; State.transcript = '';
   State.dragOffsetX = 0; State.dragOffsetY = 0;
   document.getElementById('chatMessages').innerHTML = '';
   document.getElementById('jsmind_container').innerHTML = '';
@@ -2581,7 +2610,19 @@ function clearAll() {
   document.getElementById('sparkList').innerHTML = '';
   document.getElementById('zoomControls').style.display = 'none';
   State.zoomScale = 1.0;
-  showToast('已清空当前内容');
+  // 隐藏返回按钮
+  document.getElementById('backBtn').style.display = 'none';
+  showToast('已返回');
+}
+
+// 更新返回按钮显示状态
+function updateBackButton() {
+  const backBtn = document.getElementById('backBtn');
+  if (State.mindmapData) {
+    backBtn.style.display = 'flex';
+  } else {
+    backBtn.style.display = 'none';
+  }
 }
 
 // ==================== Toast ====================
