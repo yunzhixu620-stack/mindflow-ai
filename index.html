@@ -2492,16 +2492,57 @@ function setMeetingType(type, el) {
   if (type === 'brainstorm' && goalInput.value.trim()) generateMeetingFramework(goalInput.value.trim());
 }
 
+function safeParseJSON(text) {
+  // 尝试提取最外层的 JSON 对象
+  const match = text.match(/\{[\s\S]*\}/);
+  if (!match) return null;
+  
+  try {
+    return JSON.parse(match[0]);
+  } catch (e) {
+    // 尝试修复常见的 JSON 错误
+    let fixed = match[0];
+    
+    // 修复单引号问题
+    fixed = fixed.replace(/'([^']*)'/g, '"$1"');
+    
+    // 修复缺少引号的 key
+    fixed = fixed.replace(/([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":');
+    
+    // 移除尾部的多余逗号
+    fixed = fixed.replace(/,\s*([}\]])/g, '$1');
+    
+    try {
+      return JSON.parse(fixed);
+    } catch (e2) {
+      return null;
+    }
+  }
+}
+
 async function generateMeetingFramework(goal) {
-  const systemPrompt = '你是资深战略顾问，擅长将会议目标拆解为结构化的思考框架。\n\n生成思维导图 JSON，格式：\n{"topic":"主题","children":[{"topic":"维度1","children":[{"topic":"核心洞察"}]}]}\n\n严格规则：\n1. 只生成 3-5 个一级分支（维度），每个分支 1-3 个子节点\n2. 节点内容必须是「观点」或「判断」，不是数据罗列\n3. 不要罗列数字、人名、日期等原始数据\n4. 用简洁有力的短语表达核心洞察（如「下沉市场是增长突破口」而非「三线城市用户占比53.6%」）\n5. 一级分支加 emoji 前缀\n6. 最多 3 层，不要更深\n7. 只输出 JSON';
+  const systemPrompt = '你是资深战略顾问，擅长将会议目标拆解为结构化的思考框架。\n\n生成思维导图 JSON，格式：\n{"topic":"主题","children":[{"topic":"维度1","children":[{"topic":"核心洞察"}]}]}\n\n严格规则：\n1. 只生成 3-5 个一级分支（维度），每个分支 1-3 个子节点\n2. 节点内容必须是「观点」或「判断」，不是数据罗列\n3. 不要罗列数字、人名、日期等原始数据\n4. 用简洁有力的短语表达核心洞察（如「下沉市场是增长突破口」而非「三线城市用户占比53.6%」）\n5. 一级分支加 emoji 前缀\n6. 最多 3 层，不要更深\n7. 只输出 JSON，不要有其他文字';
   addMessage('ai', '<div class="loading-dots"><span></span><span></span><span></span></div> 正在生成框架...');
   const result = await callAI(systemPrompt, '会议目标：' + goal);
   if (result) {
-    try {
-      const data = JSON.parse(result.match(/\{[\s\S]*\}/)[0]);
-      renderMindmap(data); addMessage('ai', '会议框架已生成，围绕"' + goal + '"展开。');
+    const data = safeParseJSON(result);
+    if (data && data.topic) {
+      renderMindmap(data); 
+      addMessage('ai', '✅ 会议框架已生成，围绕"' + goal + '"展开。');
       saveCurrentToHistory(goal);
-    } catch(e) { addMessage('ai', '框架生成失败，请重试。'); }
+    } else {
+      // JSON 解析失败，尝试用纯文本生成
+      addMessage('ai', '⚠️ AI 返回格式有误，正在重试...');
+      const retryResult = await callAI(systemPrompt, '会议目标：' + goal + '\n\n请严格按照 JSON 格式返回，不要有任何其他文字。');
+      const retryData = safeParseJSON(retryResult);
+      if (retryData && retryData.topic) {
+        renderMindmap(retryData);
+        addMessage('ai', '✅ 框架已生成（重试成功）。');
+        saveCurrentToHistory(goal);
+      } else {
+        addMessage('ai', '❌ 框架生成失败，请尝试更简洁的会议目标，或稍后重试。');
+      }
+    }
   }
 }
 
@@ -2716,7 +2757,7 @@ function stopASR() {
 
 // ==================== 消息处理 ====================
 function handleKeyDown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
-function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 100) + 'px'; }
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 150) + 'px'; }
 
 function addMessage(role, content, isError) {
   const container = document.getElementById('chatMessages');
@@ -2803,25 +2844,29 @@ async function callAI(systemPrompt, userMessage, temperature) {
 // ==================== 会议模式 ====================
 async function processMeetingInput(text) {
   if (!State.mindmapData) {
-    const sp = '你是资深战略顾问，擅长从会议内容中提炼核心观点和决策逻辑。\n\n格式：{"topic":"会议主题","children":[{"topic":"核心维度","children":[{"topic":"关键洞察/判断"}]}]}\n\n严格规则：\n1. 只保留 3-5 个一级分支，每个 1-3 个子节点\n2. 每个节点必须是「观点」或「结论」或「行动判断」，不要罗列原始数据\n3. 把散乱信息提炼成有逻辑的判断句（如「技术方案需重新评估」而非「张三说方案有问题」）\n4. 一级分支加 emoji 前缀\n5. 最多 3 层，不要更深\n6. 只输出 JSON';
+    const sp = '你是资深战略顾问，擅长从会议内容中提炼核心观点和决策逻辑。\n\n格式：{"topic":"会议主题","children":[{"topic":"核心维度","children":[{"topic":"关键洞察/判断"}]}]}\n\n严格规则：\n1. 只保留 3-5 个一级分支，每个 1-3 个子节点\n2. 每个节点必须是「观点」或「结论」或「行动判断」，不要罗列原始数据\n3. 把散乱信息提炼成有逻辑的判断句（如「技术方案需重新评估」而非「张三说方案有问题」）\n4. 一级分支加 emoji 前缀\n5. 最多 3 层，不要更深\n6. 只输出 JSON，不要有其他文字';
     const result = await callAI(sp, '会议内容：\n' + text);
     if (result) {
-      try {
-        const data = JSON.parse(result.match(/\{[\s\S]*\}/)[0]);
+      const data = safeParseJSON(result);
+      if (data && data.topic) {
         renderMindmap(data); addMessage('ai', '✅ 会议导图已生成，继续输入会自动更新。');
         saveCurrentToHistory(data.topic);
-      } catch(e) { addMessage('ai', '内容解析失败，请尝试更详细的描述。', true); }
+      } else {
+        addMessage('ai', '⚠️ 解析格式有误，请尝试更详细的描述。', true);
+      }
     }
   } else {
-    const sp = '你是资深战略顾问。请将新内容提炼后整合到现有思维导图中。\n当前导图：\n' + JSON.stringify(State.mindmapData, null, 2) + '\n\n规则：\n1. 将新信息提炼为观点判断，与现有节点相关则合并，否则创建新分支\n2. 保持原有结构和 emoji 前缀\n3. 不增加超过 3 层的深度\n4. 只输出完整 JSON';
+    const sp = '你是资深战略顾问。请将新内容提炼后整合到现有思维导图中。\n当前导图：\n' + JSON.stringify(State.mindmapData, null, 2) + '\n\n规则：\n1. 将新信息提炼为观点判断，与现有节点相关则合并，否则创建新分支\n2. 保持原有结构和 emoji 前缀\n3. 不增加超过 3 层的深度\n4. 只输出完整 JSON，不要有其他文字';
     const result = await callAI(sp, '新增内容：\n' + text);
     if (result) {
-      try {
-        const data = JSON.parse(result.match(/\{[\s\S]*\}/)[0]);
+      const data = safeParseJSON(result);
+      if (data && data.topic) {
         renderMindmap(data); addMessage('ai', '✅ 导图已更新。');
         saveCurrentToHistory(data.topic);
         if (State.meetingType === 'brainstorm') triggerBrainstorm(text);
-      } catch(e) { addMessage('ai', '更新失败，请重试。', true); }
+      } else {
+        addMessage('ai', '⚠️ 更新失败，请重试。', true);
+      }
     }
   }
 }
@@ -2829,24 +2874,28 @@ async function processMeetingInput(text) {
 // ==================== 知识碎片模式 ====================
 async function processKnowledgeInput(text) {
   if (!State.mindmapData) {
-    const sp = '你是知识管理专家，擅长从碎片信息中提炼核心原理和底层逻辑。\n\n格式：{"topic":"知识主题","children":[{"topic":"核心原理/规律","children":[{"topic":"具体表现/推论"}]}]}\n\n严格规则：\n1. 只保留 3-5 个一级分支，每个 1-2 个子节点\n2. 每个节点必须是「概念定义」「核心原理」「因果逻辑」或「实践启示」\n3. 不要罗列表面现象，要挖掘背后的 WHY（如「反馈延迟导致行为矫正困难」而非「人们坚持不了习惯」）\n4. 一级分支加 emoji 前缀\n5. 最多 3 层，不要更深\n6. 只输出 JSON';
+    const sp = '你是知识管理专家，擅长从碎片信息中提炼核心原理和底层逻辑。\n\n格式：{"topic":"知识主题","children":[{"topic":"核心原理/规律","children":[{"topic":"具体表现/推论"}]}]}\n\n严格规则：\n1. 只保留 3-5 个一级分支，每个 1-2 个子节点\n2. 每个节点必须是「概念定义」「核心原理」「因果逻辑」或「实践启示」\n3. 不要罗列表面现象，要挖掘背后的 WHY（如「反馈延迟导致行为矫正困难」而非「人们坚持不了习惯」）\n4. 一级分支加 emoji 前缀\n5. 最多 3 层，不要更深\n6. 只输出 JSON，不要有其他文字';
     const result = await callAI(sp, '知识碎片：\n' + text);
     if (result) {
-      try {
-        const data = JSON.parse(result.match(/\{[\s\S]*\}/)[0]);
+      const data = safeParseJSON(result);
+      if (data && data.topic) {
         renderMindmap(data); addMessage('ai', '✅ 知识树已生成，继续输入会自动整合。');
         saveCurrentToHistory(data.topic);
-      } catch(e) { addMessage('ai', '解析失败，请重试。', true); }
+      } else {
+        addMessage('ai', '⚠️ 解析格式有误，请重试。', true);
+      }
     }
   } else {
-    const sp = '你是知识管理专家。请将新知识提炼后整合到现有知识树中。\n当前知识树：\n' + JSON.stringify(State.mindmapData, null, 2) + '\n\n规则：\n1. 将新知识提炼为原理/规律/推论，找到最合适的位置整合\n2. 不增加超过 3 层的深度\n3. 保持原有结构和 emoji 前缀\n4. 只输出完整 JSON';
+    const sp = '你是知识管理专家。请将新知识提炼后整合到现有知识树中。\n当前知识树：\n' + JSON.stringify(State.mindmapData, null, 2) + '\n\n规则：\n1. 将新知识提炼为原理/规律/推论，找到最合适的位置整合\n2. 不增加超过 3 层的深度\n3. 保持原有结构和 emoji 前缀\n4. 只输出完整 JSON，不要有其他文字';
     const result = await callAI(sp, '新知识：\n' + text);
     if (result) {
-      try {
-        const data = JSON.parse(result.match(/\{[\s\S]*\}/)[0]);
+      const data = safeParseJSON(result);
+      if (data && data.topic) {
         renderMindmap(data); addMessage('ai', '✅ 知识树已更新。');
         saveCurrentToHistory(data.topic);
-      } catch(e) { addMessage('ai', '更新失败，请重试。', true); }
+      } else {
+        addMessage('ai', '⚠️ 更新失败，请重试。', true);
+      }
     }
   }
 }
@@ -2857,24 +2906,29 @@ async function processArticleInput(text) {
     addMessage('ai', '⚠️ 目前无法直接访问链接，请复制文章正文后粘贴给我。公众号文章可以用「阅读原文」复制全文。');
     return;
   }
-  const sp = '你是资深分析师，擅长从文章中提炼核心论点和逻辑链条。\n\n格式：{"topic":"文章核心论点","children":[{"topic":"分论点/论据维度","children":[{"topic":"关键推论/洞察"}]}]}\n\n严格规则：\n1. 只保留 3-5 个一级分支，每个 1-2 个子节点\n2. 每个节点必须是「论点」「判断」「逻辑推理」或「核心洞察」\n3. 不要照搬原文句子，用自己的话提炼观点（如「数据驱动决策是增长的关键杠杆」而非「文中提到通过数据分析发现增长点」）\n4. 把具体案例和数据抽象为判断句，不要直接罗列\n5. 一级分支加 emoji 前缀\n6. 最多 3 层，不要更深\n7. 只输出 JSON';
+  const sp = '你是资深分析师，擅长从文章中提炼核心论点和逻辑链条。\n\n格式：{"topic":"文章核心论点","children":[{"topic":"分论点/论据维度","children":[{"topic":"关键推论/洞察"}]}]}\n\n严格规则：\n1. 只保留 3-5 个一级分支，每个 1-2 个子节点\n2. 每个节点必须是「论点」「判断」「逻辑推理」或「核心洞察」\n3. 不要照搬原文句子，用自己的话提炼观点（如「数据驱动决策是增长的关键杠杆」而非「文中提到通过数据分析发现增长点」）\n4. 把具体案例和数据抽象为判断句，不要直接罗列\n5. 一级分支加 emoji 前缀\n6. 最多 3 层，不要更深\n7. 只输出 JSON，不要有其他文字';
   const result = await callAI(sp, '文章内容：\n\n' + text);
   if (result) {
-    try {
-      const data = JSON.parse(result.match(/\{[\s\S]*\}/)[0]);
+    const data = safeParseJSON(result);
+    if (data && data.topic) {
       renderMindmap(data); addMessage('ai', '✅ 文章解析完成，继续粘贴更多内容会自动关联。');
       saveCurrentToHistory(data.topic);
-    } catch(e) { addMessage('ai', '文章解析失败，请检查内容是否完整。', true); }
+    } else {
+      addMessage('ai', '⚠️ 文章解析失败，请检查内容是否完整。', true);
+    }
   }
 }
 
 // ==================== 思维碰撞 ====================
 async function triggerBrainstorm(context) {
-  const sp = '请基于以下内容提供 3-5 个思维方向或灵感火花，每个用 1-2 句描述。\n输出 JSON 数组：["方向1：描述", "方向2：描述"]\n只输出数组。';
+  const sp = '请基于以下内容提供 3-5 个思维方向或灵感火花，每个用 1-2 句描述。\n输出 JSON 数组：["方向1：描述", "方向2：描述"]\n只输出数组，不要有其他文字。';
   const result = await callAI(sp, context, 0.9);
   if (result) {
     try {
-      const ideas = JSON.parse(result.match(/\[[\s\S]*\]/)[0]);
+      // 尝试解析 JSON 数组
+      const match = result.match(/\[[\s\S]*\]/);
+      if (!match) throw new Error('No array found');
+      const ideas = JSON.parse(match[0]);
       const list = document.getElementById('sparkList');
       list.innerHTML = '';
       ideas.forEach(idea => {
@@ -2883,7 +2937,21 @@ async function triggerBrainstorm(context) {
         item.onclick = () => { document.getElementById('userInput').value = idea; showToast('已填入输入框'); };
         list.appendChild(item);
       });
-    } catch(e) {}
+    } catch(e) {
+      // 降级处理：尝试按行分割
+      const lines = result.split('\n').filter(l => l.trim() && !l.includes('JSON'));
+      if (lines.length > 0) {
+        const list = document.getElementById('sparkList');
+        list.innerHTML = '';
+        lines.slice(0, 5).forEach(idea => {
+          const item = document.createElement('div');
+          item.className = 'spark-item'; 
+          item.textContent = idea.replace(/^\d+[.、]\s*/, '').replace(/^["']|["']$/g, '');
+          item.onclick = () => { document.getElementById('userInput').value = item.textContent; showToast('已填入输入框'); };
+          list.appendChild(item);
+        });
+      }
+    }
   }
 }
 
