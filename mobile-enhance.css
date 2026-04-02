@@ -251,3 +251,113 @@
     min-width: 60px;
   }
 }
+
+/* ================================================================ */
+/* ===== 手机端新增元素适配 ===== */
+/* ================================================================ */
+
+@media (max-width: 768px) {
+  /* 隐藏悬浮输入框相关元素（使用侧边栏输入） */
+  .floating-input,
+  .floating-toggle {
+    display: none !important;
+  }
+  
+  /* 布局控制按钮优化 */
+  .layout-controls {
+    bottom: 10px;
+    left: 10px;
+    z-index: 60;
+  }
+  .layout-btn {
+    width: 36px;
+    height: 36px;
+  }
+  
+  /* 确保顶部导航按钮可点击 */
+  .topbar-right {
+    display: flex;
+    gap: 4px;
+  }
+  
+  /* 去除不必要的装饰 */
+  .topbar-divider {
+    display: none;
+  }
+  
+  /* 历史记录区更紧凑 */
+  .history-section {
+    max-height: 100px;
+  }
+  
+  /* 输入框区域优化 */
+  .input-area {
+    padding: 8px 10px;
+  }
+  
+  /* 确保导图容器占满 */
+  #jsmind_container {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  /* jsMind canvas 适配 */
+  .jsmind-inner {
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  /* 缩放控件位置调整 */
+  .zoom-controls {
+    bottom: 10px;
+    right: 10px;
+    z-index: 50;
+  }
+  
+  /* 模板弹窗适配 */
+  .template-modal {
+    width: 95% !important;
+    max-height: 70vh !important;
+    padding: 16px !important;
+  }
+  
+  /* 设置弹窗适配 */
+  .settings-modal {
+    width: 95% !important;
+    max-height: 80vh !important;
+    padding: 16px !important;
+    overflow-y: auto;
+  }
+  
+  /* 导出菜单适配 */
+  .export-menu {
+    right: 0;
+    left: auto;
+  }
+  
+  /* 隐藏返回按钮（手机端不需要） */
+  #backBtn {
+    display: none !important;
+  }
+}
+
+/* 更小屏幕优化 */
+@media (max-width: 375px) {
+  .layout-controls {
+    bottom: 8px;
+    left: 8px;
+  }
+  
+  .zoom-controls {
+    bottom: 8px;
+    right: 8px;
+  }
+  
+  .topbar {
+    padding: 0 8px;
+  }
+  
+  .logo span {
+    display: none; /* 只显示图标 */
+  }
+}
