@@ -9,17 +9,17 @@ html {
 
 /* 手机端适配 - 飞书/微信/刘海屏 */
 @media (max-width: 768px) {
-  /* 顶部导航 */
+  /* 顶部导航 - 改为80px避开灵动岛 */
   .topbar {
-    height: 48px !important;
-    min-height: 48px !important;
+    height: 80px !important;
+    min-height: 80px !important;
   }
   
   /* 主体布局 */
   .main {
     flex-direction: column !important;
     height: auto !important;
-    min-height: calc(100vh - 48px) !important;
+    min-height: calc(100vh - 80px) !important;
   }
   
   /* 侧边栏 */
@@ -31,7 +31,7 @@ html {
     overflow-y: auto !important;
   }
   
-  /* 输入区域 - 底部空间 */
+  /* 输入区域 - 底部空间保持60px */
   .input-area {
     padding-bottom: 60px !important;
     min-height: 120px !important;
