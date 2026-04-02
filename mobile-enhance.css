@@ -7,41 +7,49 @@ html {
   text-size-adjust: 100%;
 }
 
-/* 手机端简单适配 - 不破坏原有布局 */
+/* 手机端适配 - 飞书/微信/刘海屏 */
 @media (max-width: 768px) {
-  /* 顶部避开刘海 */
+  /* 顶部导航 */
   .topbar {
-    height: 50px !important;
-    min-height: 50px !important;
+    height: 48px !important;
+    min-height: 48px !important;
   }
   
-  /* 侧边栏留出底部空间给输入框 */
+  /* 主体布局 - 用 flex  column */
+  .main {
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: calc(100vh - 48px) !important;
+  }
+  
+  /* 侧边栏 */
   .sidebar {
-    padding-bottom: 30px !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    height: auto !important;
+    max-height: 45% !important;
+    overflow-y: auto !important;
   }
   
-  /* 输入框区域增加底部安全距离 */
+  /* 输入区域 - 关键：底部留足够空间 */
   .input-area {
-    padding-bottom: 30px !important;
-    min-height: 100px !important;
-  }
-  
-  /* 输入框加大 */
-  .input-box {
-    margin-bottom: 10px !important;
+    padding-bottom: 60px !important;
+    min-height: 120px !important;
   }
   
   /* 导图区域 */
   .mindmap-area {
-    min-height: 200px !important;
+    flex: 1 !important;
+    min-height: 300px !important;
   }
   
-  /* 隐藏一些不必要的元素减少干扰 */
-  .layout-controls {
-    bottom: 80px !important;
+  /* 输入框 - 确保不被遮挡 */
+  #userInput {
+    margin-bottom: 50px !important;
   }
   
+  /* 缩放控件 - 上移 */
   .zoom-controls {
-    bottom: 80px !important;
+    bottom: 70px !important;
   }
 }
