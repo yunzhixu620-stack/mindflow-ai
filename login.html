@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindFlow - 登录</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-base: #09090b;
+    --bg-surface: #111113;
+    --bg-elevated: #18181b;
+    --bg-hover: #1f1f23;
+    --border-subtle: rgba(255,255,255,0.06);
+    --border-default: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.12);
+    --text-primary: #fafafa;
+    --text-secondary: #a1a1aa;
+    --text-tertiary: #71717a;
+    --accent: #6366f1;
+    --accent-hover: #818cf8;
+    --accent-subtle: rgba(99,102,241,0.1);
+    --accent-border: rgba(99,102,241,0.25);
+    --success: #22c55e;
+    --danger: #ef4444;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .login-container {
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+
+  .logo {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--accent), #a855f7);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-icon svg {
+    width: 28px;
+    height: 28px;
+    stroke: white;
+    fill: none;
+    stroke-width: 2;
+  }
+
+  .tagline {
+    color: var(--text-tertiary);
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+
+  .login-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    padding: 32px 24px;
+    text-align: left;
+  }
+
+  .login-card h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .login-card p {
+    color: var(--text-tertiary);
+    font-size: 13px;
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+
+  .input-group {
+    margin-bottom: 16px;
+  }
+
+  .input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-default);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+    font-family: inherit;
+  }
+
+  .input-group input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-subtle);
+  }
+
+  .input-group input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(99,102,241,0.3);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-github {
+    background: #24292e;
+    margin-top: 12px;
+  }
+
+  .btn-github:hover {
+    background: #2f363d;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+
+  .btn-github svg {
+    width: 18px;
+    height: 18px;
+    fill: white;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    margin: 24px 0;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  .divider::before,
+  .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-default);
+  }
+
+  .divider span {
+    padding: 0 12px;
+  }
+
+  .help-text {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+
+  .help-text a {
+    color: var(--accent-hover);
+    text-decoration: none;
+  }
+
+  .help-text a:hover {
+    text-decoration: underline;
+  }
+
+  .error-msg {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.2);
+    color: #fca5a5;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  .error-msg.show {
+    display: block;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+    margin-bottom: 20px;
+  }
+
+  .user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 600;
+    color: white;
+  }
+
+  .user-details {
+    flex: 1;
+  }
+
+  .user-name {
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .user-login {
+    color: var(--text-tertiary);
+    font-size: 12px;
+  }
+
+  .btn-logout {
+    padding: 6px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-default);
+    background: transparent;
+    color: var(--text-tertiary);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-logout:hover {
+    background: rgba(239,68,68,0.1);
+    border-color: rgba(239,68,68,0.3);
+    color: var(--danger);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    border-radius: var(--radius-lg);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .toast.show {
+    opacity: 1;
+  }
+
+  .toast.success {
+    border-color: rgba(34,197,94,0.3);
+  }
+
+  .toast.error {
+    border-color: rgba(239,68,68,0.3);
+  }
+
+  /* 加载动画 */
+  .loading {
+    display: inline-flex;
+    gap: 4px;
+  }
+
+  .loading span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+
+  .loading span:nth-child(2) { animation-delay: 0.15s; }
+  .loading span:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes bounce {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<div class="login-container" id="loginContainer">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5"/>
+        <path d="M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    MindFlow
+  </div>
+  <p class="tagline">AI 驱动的思维导图 · 数据存你的 GitHub</p>
+
+  <div class="login-card" id="loginCard">
+    <!-- 未登录状态 -->
+    <div id="unloggedIn">
+      <h2>欢迎回来 👋</h2>
+      <p>登录后你的思维导图将自动同步到 GitHub Gist，换设备也能继续工作。</p>
+
+      <div class="error-msg" id="errorMsg"></div>
+
+      <div class="input-group">
+        <label>GitHub Personal Access Token</label>
+        <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxx" />
+      </div>
+
+      <button class="btn-primary" id="loginBtn" onclick="handleLogin()">
+        登录
+      </button>
+
+      <div class="divider"><span>或</span></div>
+
+      <button class="btn-primary btn-github" onclick="openGitHubOAuth()">
+        <svg viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        用 GitHub 授权登录
+      </button>
+
+      <p class="help-text">
+        需要 Gist 权限。<a href="https://github.com/settings/tokens/new?scopes=gist&description=MindFlow" target="_blank">创建 Token ↗</a><br>
+        登录后 Token 保存在浏览器本地，换设备需重新输入
+      </p>
+    </div>
+
+    <!-- 已登录状态 -->
+    <div id="loggedIn" style="display: none;">
+      <h2>已登录 🎉</h2>
+      <p>正在进入 MindFlow...</p>
+
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatar">?</div>
+        <div class="user-details">
+          <div class="user-name" id="userName">加载中...</div>
+          <div class="user-login" id="userLogin">@loading</div>
+        </div>
+        <button class="btn-logout" onclick="handleLogout()">退出</button>
+      </div>
+
+      <button class="btn-primary" onclick="enterApp()">
+        进入 MindFlow →
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const GITHUB_API = 'https://api.github.com';
+const GITHUB_CLIENT_ID = 'Iv1.8e559ab8c20a2d35'; // GitHub OAuth App Client ID
+
+// 检查登录状态
+function checkLogin() {
+  const token = localStorage.getItem('mindflow_github_token');
+  if (token) {
+    showLoggedInState(token);
+  }
+}
+
+// 显示已登录状态
+async function showLoggedInState(token) {
+  document.getElementById('unloggedIn').style.display = 'none';
+  document.getElementById('loggedIn').style.display = 'block';
+
+  try {
+    const res = await fetch(GITHUB_API + '/user', {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+
+    if (!res.ok) throw new Error('Token 无效');
+
+    const user = await res.json();
+    document.getElementById('userAvatar').textContent = user.login.charAt(0).toUpperCase();
+    document.getElementById('userName').textContent = user.name || user.login;
+    document.getElementById('userLogin').textContent = '@' + user.login;
+
+    // 1秒后自动进入
+    setTimeout(() => enterApp(), 1000);
+  } catch (e) {
+    localStorage.removeItem('mindflow_github_token');
+    showError('Token 已失效，请重新登录');
+    showLoginState();
+  }
+}
+
+// 显示登录状态
+function showLoginState() {
+  document.getElementById('unloggedIn').style.display = 'block';
+  document.getElementById('loggedIn').style.display = 'none';
+}
+
+// 登录处理
+async function handleLogin() {
+  const token = document.getElementById('tokenInput').value.trim();
+  if (!token) {
+    showError('请输入 Token');
+    return;
+  }
+
+  if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
+    showError('Token 格式不正确，应以 ghp_ 或 github_pat_ 开头');
+    return;
+  }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading"><span></span><span></span><span></span></span> 验证中...';
+
+  try {
+    const res = await fetch(GITHUB_API + '/user', {
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error('Token 无效或已过期');
+    }
+
+    // 保存 token
+    localStorage.setItem('mindflow_github_token', token);
+
+    showToast('登录成功！', 'success');
+    showLoggedInState(token);
+  } catch (e) {
+    showError(e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '登录';
+  }
+}
+
+// GitHub OAuth 授权
+function openGitHubOAuth() {
+  // 使用 GitHub Device Flow 或提示用户创建 Token
+  const url = 'https://github.com/settings/tokens/new?scopes=gist&description=MindFlow';
+  window.open(url, '_blank');
+  showToast('请在新页面创建 Token，然后回来粘贴', 'success');
+}
+
+// 退出登录
+function handleLogout() {
+  localStorage.removeItem('mindflow_github_token');
+  showToast('已退出登录');
+  showLoginState();
+}
+
+// 进入应用
+function enterApp() {
+  window.location.href = 'index.html';
+}
+
+// 错误提示
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+// Toast
+function showToast(msg, type) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast show' + (type ? ' ' + type : '');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// 回车登录
+document.getElementById('tokenInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') handleLogin();
+});
+
+// 初始化
+checkLogin();
+</script>
+
+</body>
+</html>
