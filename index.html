@@ -1,0 +1,2445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MindFlow</title>
+<link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsmind@0.9.1/style/jsmind.css" />
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jsmind@0.9.1/es6/jsmind.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+</style>
+<!-- 移动端增强样式 -->
+<link rel="stylesheet" href="./mobile-enhance.css">
+<style>
+
+  :root {
+    --bg-base: #09090b;
+    --bg-surface: #111113;
+    --bg-elevated: #18181b;
+    --bg-hover: #1f1f23;
+    --bg-active: #27272a;
+    --border-subtle: rgba(255,255,255,0.06);
+    --border-default: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.12);
+    --text-primary: #fafafa;
+    --text-secondary: #a1a1aa;
+    --text-tertiary: #71717a;
+    --text-muted: #52525b;
+    --accent: #6366f1;
+    --accent-hover: #818cf8;
+    --accent-subtle: rgba(99,102,241,0.1);
+    --accent-border: rgba(99,102,241,0.25);
+    --success: #22c55e;
+    --success-subtle: rgba(34,197,94,0.1);
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --danger-subtle: rgba(239,68,68,0.1);
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
+    --transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* 分支颜色 - 8 种和谐色 */
+    --branch-1: #6366f1;
+    --branch-2: #06b6d4;
+    --branch-3: #f59e0b;
+    --branch-4: #10b981;
+    --branch-5: #f43f5e;
+    --branch-6: #8b5cf6;
+    --branch-7: #ec4899;
+    --branch-8: #14b8a6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== 顶部导航 ===== */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    height: 48px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-subtle);
+    flex-shrink: 0;
+    z-index: 100;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+  .logo {
+    font-size: 14px; font-weight: 600; letter-spacing: -0.02em;
+    color: var(--text-primary); display: flex; align-items: center; gap: 8px; user-select: none;
+  }
+  .logo-icon {
+    width: 20px; height: 20px;
+    background: linear-gradient(135deg, var(--accent), #a855f7);
+    border-radius: 5px; display: flex; align-items: center; justify-content: center;
+  }
+  .logo-icon svg { width: 12px; height: 12px; }
+
+  .mode-tabs {
+    display: flex; gap: 2px;
+    background: var(--bg-elevated); border-radius: var(--radius-md);
+    padding: 2px; border: 1px solid var(--border-subtle);
+  }
+  .mode-tab {
+    padding: 5px 12px; border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 12px; font-weight: 500; color: var(--text-tertiary);
+    transition: all var(--transition); border: none; background: none;
+    white-space: nowrap; display: flex; align-items: center; gap: 5px;
+    position: relative;
+  }
+  .mode-tab:hover { color: var(--text-secondary); background: var(--bg-hover); }
+  .mode-tab.active { background: var(--accent); color: #fff; box-shadow: 0 1px 3px rgba(99,102,241,0.3); }
+  .mode-tab .tab-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: 0.6; }
+
+  .mode-tab::after {
+    content: attr(data-tip);
+    position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+    background: var(--bg-elevated); border: 1px solid var(--border-default);
+    color: var(--text-secondary); font-size: 11px; font-weight: 400;
+    padding: 5px 10px; border-radius: var(--radius-md); white-space: nowrap;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 999;
+    box-shadow: var(--shadow-md);
+  }
+  .mode-tab:hover::after { opacity: 1; }
+
+  .topbar-right { display: flex; gap: 2px; align-items: center; }
+  .btn-icon {
+    width: 32px; height: 32px; border-radius: var(--radius-sm); border: none;
+    background: transparent; color: var(--text-tertiary); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all var(--transition); position: relative;
+  }
+  .btn-icon:hover { background: var(--bg-hover); color: var(--text-secondary); }
+  .btn-icon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .btn-icon[title]:hover::after {
+    content: attr(title);
+    position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    background: var(--bg-elevated); border: 1px solid var(--border-default);
+    color: var(--text-secondary); font-size: 11px; padding: 4px 8px;
+    border-radius: var(--radius-sm); white-space: nowrap; z-index: 999;
+    box-shadow: var(--shadow-md); pointer-events: none;
+  }
+
+  .topbar-divider { width: 1px; height: 20px; background: var(--border-default); margin: 0 4px; }
+
+  /* ===== 主体布局 ===== */
+  .main { display: flex; flex: 1; overflow: hidden; }
+
+  /* ===== 左侧面板 ===== */
+  .sidebar {
+    width: 340px; min-width: 340px;
+    background: var(--bg-surface); border-right: 1px solid var(--border-subtle);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  .history-section {
+    border-bottom: 1px solid var(--border-subtle);
+    flex-shrink: 0;
+  }
+  .history-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; cursor: pointer; user-select: none;
+    transition: background var(--transition);
+  }
+  .history-header:hover { background: var(--bg-hover); }
+  .history-header-left { display: flex; align-items: center; gap: 6px; }
+  .history-header-left span { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+  .history-count {
+    font-size: 10px; background: var(--accent-subtle); color: var(--accent-hover);
+    border: 1px solid var(--accent-border); border-radius: 10px;
+    padding: 1px 6px; font-weight: 600;
+  }
+  .history-chevron {
+    width: 14px; height: 14px; stroke: var(--text-muted); fill: none; stroke-width: 2;
+    transition: transform var(--transition);
+  }
+  .history-section.open .history-chevron { transform: rotate(180deg); }
+  .history-list {
+    max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+  }
+  .history-section.open .history-list { max-height: 220px; overflow-y: auto; }
+  .history-list::-webkit-scrollbar { width: 3px; }
+  .history-list::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 3px; }
+
+  .history-item {
+    display: flex; align-items: center; padding: 8px 14px;
+    cursor: pointer; border-bottom: 1px solid var(--border-subtle);
+    transition: background var(--transition); gap: 8px;
+  }
+  .history-item:hover { background: var(--bg-hover); }
+  .history-item.active { background: var(--accent-subtle); }
+  .history-item-icon {
+    width: 28px; height: 28px; border-radius: var(--radius-sm);
+    background: var(--bg-elevated); border: 1px solid var(--border-default);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    font-size: 13px;
+  }
+  .history-item-info { flex: 1; min-width: 0; }
+  .history-item-title {
+    font-size: 12px; font-weight: 500; color: var(--text-primary);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .history-item-meta { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+  .history-item-del {
+    width: 20px; height: 20px; border-radius: 4px; border: none;
+    background: transparent; color: var(--text-muted); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: all var(--transition); flex-shrink: 0;
+  }
+  .history-item:hover .history-item-del { opacity: 1; }
+  .history-item-del:hover { background: var(--danger-subtle); color: var(--danger); }
+  .history-item-del svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  .history-empty {
+    padding: 16px 14px; text-align: center;
+    font-size: 12px; color: var(--text-muted);
+  }
+
+  .sidebar-header { padding: 14px 14px 10px; border-bottom: 1px solid var(--border-subtle); }
+  .sidebar-header h3 { font-size: 13px; font-weight: 600; letter-spacing: -0.01em; }
+  .sidebar-header p { font-size: 11px; color: var(--text-tertiary); line-height: 1.6; margin-top: 3px; }
+
+  .meeting-controls { display: none; padding: 8px 14px; border-bottom: 1px solid var(--border-subtle); }
+  .meeting-controls.show { display: flex; gap: 5px; flex-wrap: wrap; }
+  .meeting-type-btn {
+    padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border-default);
+    background: transparent; color: var(--text-tertiary); font-size: 11px;
+    cursor: pointer; transition: all var(--transition); font-family: inherit;
+  }
+  .meeting-type-btn:hover { border-color: var(--border-strong); color: var(--text-secondary); }
+  .meeting-type-btn.active { background: var(--accent-subtle); color: var(--accent-hover); border-color: var(--accent-border); }
+  .meeting-goal {
+    width: 100%; margin-top: 6px; padding: 7px 10px;
+    border-radius: var(--radius-md); border: 1px solid var(--border-default);
+    background: var(--bg-base); color: var(--text-primary); font-size: 12px;
+    outline: none; display: none; font-family: inherit; transition: border-color var(--transition);
+  }
+  .meeting-goal.show { display: block; }
+  .meeting-goal:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-subtle); }
+  .meeting-goal::placeholder { color: var(--text-muted); }
+
+  .input-area { padding: 10px 14px; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .chat-messages { flex: 1; overflow-y: auto; padding-right: 4px; margin-bottom: 10px; }
+  .chat-messages::-webkit-scrollbar { width: 3px; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 3px; }
+
+  .msg { margin-bottom: 14px; animation: msgIn 0.2s ease; }
+  @keyframes msgIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+  .msg-label { font-size: 10px; font-weight: 600; color: var(--text-muted); margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .msg-ai .msg-label { color: var(--accent); }
+  .msg-bubble { padding: 9px 12px; font-size: 12.5px; line-height: 1.65; border-radius: var(--radius-lg); }
+  .msg-user .msg-bubble { background: var(--accent-subtle); border: 1px solid var(--accent-border); color: var(--text-primary); border-top-left-radius: var(--radius-sm); }
+  .msg-ai .msg-bubble { background: var(--bg-elevated); border: 1px solid var(--border-subtle); color: var(--text-secondary); border-top-left-radius: var(--radius-sm); }
+  .msg-ai.msg-error .msg-bubble { background: var(--danger-subtle); border-color: rgba(239,68,68,0.2); color: #fca5a5; }
+
+  .input-box { display: flex; gap: 6px; align-items: flex-end; padding-top: 10px; border-top: 1px solid var(--border-subtle); }
+  .input-box textarea {
+    flex: 1; padding: 9px 12px; border-radius: var(--radius-lg);
+    border: 1px solid var(--border-default); background: var(--bg-elevated);
+    color: var(--text-primary); font-size: 12.5px; resize: none; outline: none;
+    max-height: 100px; min-height: 38px; line-height: 1.5; font-family: inherit;
+    transition: border-color var(--transition), box-shadow var(--transition);
+  }
+  .input-box textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-subtle); }
+  .input-box textarea::placeholder { color: var(--text-muted); }
+
+  .btn-send {
+    width: 38px; height: 38px; border-radius: var(--radius-md); border: none;
+    background: var(--accent); color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    transition: all var(--transition);
+  }
+  .btn-send:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+  .btn-send:active { transform: translateY(0); }
+  .btn-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-send svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  .voice-btn {
+    width: 38px; height: 38px; border-radius: var(--radius-md);
+    border: 1px solid var(--border-default); background: var(--bg-elevated);
+    color: var(--text-tertiary); cursor: pointer; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0; transition: all var(--transition);
+  }
+  .voice-btn:hover { background: var(--bg-hover); color: var(--text-secondary); }
+  .voice-btn.recording { background: var(--danger-subtle); color: var(--danger); border-color: rgba(239,68,68,0.3); animation: recordPulse 2s ease-in-out infinite; }
+  @keyframes recordPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.15); }
+    50% { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+  }
+  .voice-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  
+  /* ===== 语音波形动画 ===== */
+  .voice-waveform {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    display: none; align-items: center; gap: 4px; padding: 12px 20px;
+    background: var(--bg-elevated); border: 1px solid var(--border-default);
+    border-radius: var(--radius-full); box-shadow: var(--shadow-lg); z-index: 1000;
+  }
+  .voice-waveform.active { display: flex; animation: fadeIn 0.2s ease; }
+  .voice-waveform-bar {
+    width: 4px; height: 20px; background: var(--danger); border-radius: 2px;
+    animation: wave 0.8s ease-in-out infinite;
+  }
+  .voice-waveform-bar:nth-child(1) { animation-delay: 0s; }
+  .voice-waveform-bar:nth-child(2) { animation-delay: 0.1s; }
+  .voice-waveform-bar:nth-child(3) { animation-delay: 0.2s; }
+  .voice-waveform-bar:nth-child(4) { animation-delay: 0.3s; }
+  .voice-waveform-bar:nth-child(5) { animation-delay: 0.4s; }
+  .voice-waveform-text { margin-left: 8px; font-size: 13px; color: var(--text-secondary); }
+  @keyframes wave {
+    0%, 100% { height: 8px; }
+    50% { height: 24px; }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  /* ===== 右侧导图区域 ===== */
+  .mindmap-area { flex: 1; position: relative; overflow: hidden; background: var(--bg-base); cursor: grab; }
+  .mindmap-area.dragging { cursor: grabbing; }
+  .mindmap-area::before {
+    content: ''; position: absolute; inset: 0;
+    background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.025) 1px, transparent 0);
+    background-size: 40px 40px; pointer-events: none; z-index: 0;
+  }
+  #jsmind_container { width: 100%; height: 100%; position: relative; z-index: 1; }
+
+  /* 空状态引导 */
+  .mindmap-placeholder {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    text-align: center; color: var(--text-muted); pointer-events: none; z-index: 2; width: 320px;
+  }
+  .placeholder-icon {
+    width: 56px; height: 56px; margin: 0 auto 16px;
+    border-radius: var(--radius-xl); background: var(--bg-elevated);
+    border: 1px solid var(--border-default); display: flex; align-items: center; justify-content: center;
+  }
+  .placeholder-icon svg { width: 28px; height: 28px; stroke: var(--accent); fill: none; stroke-width: 1.5; opacity: 0.6; }
+  .mindmap-placeholder h4 { font-size: 15px; font-weight: 600; color: var(--text-tertiary); margin-bottom: 6px; }
+  .mindmap-placeholder p { font-size: 12px; color: var(--text-muted); line-height: 1.7; margin-bottom: 16px; }
+  .placeholder-tips {
+    display: flex; flex-direction: column; gap: 6px; pointer-events: auto;
+  }
+  .placeholder-tip {
+    display: flex; align-items: center; gap: 10px; padding: 8px 12px;
+    background: var(--bg-elevated); border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md); cursor: pointer; text-align: left;
+    transition: all var(--transition);
+  }
+  .placeholder-tip:hover { border-color: var(--accent-border); background: var(--accent-subtle); }
+  .placeholder-tip-icon { font-size: 16px; flex-shrink: 0; }
+  .placeholder-tip-text { font-size: 11.5px; color: var(--text-secondary); line-height: 1.4; }
+  .placeholder-tip-text strong { color: var(--text-primary); display: block; margin-bottom: 1px; font-size: 12px; }
+
+  /* 思维碰撞面板 */
+  .spark-panel {
+    position: absolute; right: 12px; top: 56px; width: 240px; max-height: 320px;
+    background: var(--bg-surface); border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl); padding: 12px; overflow-y: auto;
+    display: none; z-index: 50; box-shadow: var(--shadow-lg);
+  }
+  .spark-panel.show { display: block; }
+  .spark-panel h4 { font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; letter-spacing: 0.02em; text-transform: uppercase; }
+  .spark-item {
+    padding: 7px 9px; background: var(--bg-elevated); border-radius: var(--radius-md);
+    margin-bottom: 5px; font-size: 11.5px; line-height: 1.55; cursor: pointer;
+    transition: all var(--transition); border: 1px solid transparent; color: var(--text-secondary);
+  }
+  .spark-item:hover { border-color: var(--accent-border); background: var(--accent-subtle); color: var(--text-primary); }
+
+  /* ===== 缩放控件 ===== */
+  .zoom-controls {
+    position: absolute; bottom: 16px; right: 16px;
+    display: flex; flex-direction: column; gap: 2px; z-index: 60;
+  }
+  .zoom-btn {
+    width: 32px; height: 32px; border-radius: var(--radius-md);
+    border: 1px solid var(--border-default); background: var(--bg-elevated);
+    color: var(--text-secondary); cursor: pointer; display: flex; align-items: center;
+    justify-content: center; transition: all var(--transition); font-size: 16px; font-weight: 500;
+    box-shadow: var(--shadow-sm);
+  }
+  .zoom-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-strong); }
+  .zoom-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+  .zoom-level {
+    text-align: center; font-size: 10px; color: var(--text-muted);
+    padding: 3px 0; user-select: none;
+  }
+
+  /* 导出菜单 */
+  .export-menu {
+    position: absolute; top: calc(100% + 4px); right: 0;
+    background: var(--bg-elevated); border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg); padding: 6px; min-width: 160px;
+    box-shadow: var(--shadow-lg); z-index: 201; display: none;
+  }
+  .export-menu.show { display: block; }
+  .export-menu-item {
+    display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+    border-radius: var(--radius-sm); cursor: pointer; font-size: 12px;
+    color: var(--text-secondary); transition: all var(--transition);
+  }
+  .export-menu-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .export-menu-item svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; flex-shrink: 0; }
+  .export-wrapper { position: relative; }
+
+  /* 布局切换按钮组 */
+  .layout-controls {
+    position: absolute; bottom: 16px; left: 16px;
+    display: flex; gap: 2px; z-index: 60;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: 2px;
+  }
+  .layout-btn {
+    width: 32px; height: 28px; border-radius: var(--radius-sm);
+    border: none; background: transparent;
+    color: var(--text-tertiary); cursor: pointer; display: flex; align-items: center;
+    justify-content: center; transition: all var(--transition);
+  }
+  .layout-btn:hover { background: var(--bg-hover); color: var(--text-secondary); }
+  .layout-btn.active { background: var(--accent-subtle); color: var(--accent-hover); }
+  .layout-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .layout-btn[title]:hover::after {
+    content: attr(title);
+    position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+    background: var(--bg-elevated); border: 1px solid var(--border-default);
+    color: var(--text-secondary); font-size: 11px; padding: 4px 8px;
+    border-radius: var(--radius-sm); white-space: nowrap; z-index: 999;
+    box-shadow: var(--shadow-md); pointer-events: none;
+  }
+
+  /* 设置模态框 */
+  .settings-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 200; display: none; backdrop-filter: blur(4px);
+  }
+  .settings-overlay.show { display: block; }
+  .settings-modal {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: var(--bg-elevated); border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl); padding: 24px; width: 420px; max-width: 90vw;
+    box-shadow: var(--shadow-lg); z-index: 201; display: none;
+  }
+  .settings-modal.show { display: block; }
+  .settings-modal h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .settings-modal .subtitle { font-size: 12px; color: var(--text-tertiary); margin-bottom: 20px; }
+  .setting-group { margin-bottom: 14px; }
+  .setting-group label { font-size: 12px; font-weight: 500; color: var(--text-secondary); display: block; margin-bottom: 5px; }
+  .setting-group input, .setting-group select {
+    width: 100%; padding: 8px 10px; border-radius: var(--radius-md);
+    border: 1px solid var(--border-default); background: var(--bg-base);
+    color: var(--text-primary); font-size: 12.5px; outline: none; transition: border-color var(--transition); font-family: inherit;
+  }
+  .setting-group input:focus, .setting-group select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-subtle); }
+  .setting-group input::placeholder { color: var(--text-muted); }
+  .setting-hint { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  .settings-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-subtle); }
+  .btn-secondary { padding: 7px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-default); background: transparent; color: var(--text-secondary); font-size: 12px; font-weight: 500; cursor: pointer; transition: all var(--transition); font-family: inherit; }
+  .btn-secondary:hover { background: var(--bg-hover); color: var(--text-primary); }
+  .btn-primary { padding: 7px 16px; border-radius: var(--radius-md); border: none; background: var(--accent); color: #fff; font-size: 12px; font-weight: 500; cursor: pointer; transition: all var(--transition); font-family: inherit; }
+  .btn-primary:hover { background: var(--accent-hover); box-shadow: 0 2px 8px rgba(99,102,241,0.3); }
+
+  /* 加载动画 */
+  .loading-dots { display: inline-flex; gap: 4px; align-items: center; }
+  .loading-dots span { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); animation: dotBounce 1.2s ease-in-out infinite; }
+  .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes dotBounce { 0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 20px; left: 50%;
+    transform: translateX(-50%) translateY(70px);
+    padding: 8px 16px; border-radius: var(--radius-lg);
+    background: var(--bg-elevated); border: 1px solid var(--border-default);
+    color: var(--text-primary); font-size: 12px; font-weight: 500;
+    z-index: 1000; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-lg); white-space: nowrap; display: flex; align-items: center; gap: 6px;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.toast-success { border-color: rgba(34,197,94,0.3); }
+  .toast.toast-error { border-color: rgba(239,68,68,0.3); background: #1a0f0f; }
+
+  /* ================================================================ */
+  /* ===== jsMind 样式全面重写 - 专业导图视觉 ===== */
+  /* ================================================================ */
+  .jsmind-inner { background: transparent !important; }
+
+  /* 画布拖拽相关 */
+  #jsmind_container canvas { cursor: grab; }
+  #jsmind_container canvas:active { cursor: grabbing; }
+
+  /* 右键菜单（节点操作） */
+  .node-context-menu {
+    position: fixed;
+    z-index: 1000;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: 4px;
+    min-width: 140px;
+    display: none;
+  }
+  .node-context-menu.show { display: block; }
+  .node-context-menu button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 6px 12px;
+    border: none;
+    background: none;
+    color: var(--text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition);
+  }
+  .node-context-menu button:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+  }
+  .node-context-menu button.danger:hover {
+    background: var(--danger-subtle);
+    color: var(--danger);
+  }
+  .node-context-menu button svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .node-context-menu .menu-divider {
+    height: 1px;
+    background: var(--border-subtle);
+    margin: 4px 0;
+  }
+
+  /* ---- 根节点 ---- */
+  jmnode.root {
+    background: linear-gradient(135deg, var(--accent), #a855f7) !important;
+    color: #fff !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    padding: 10px 24px !important;
+    border-radius: 12px !important;
+    border: none !important;
+    box-shadow: 0 4px 20px rgba(99,102,241,0.35) !important;
+    letter-spacing: -0.01em !important;
+    line-height: 1.5 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif !important;
+  }
+
+  /* ---- 一级节点 ---- */
+  jmnode.level-1 {
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    padding: 8px 18px !important;
+    border-radius: 10px !important;
+    border: 2px solid !important;
+    background: var(--bg-elevated) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25) !important;
+    line-height: 1.5 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif !important;
+    letter-spacing: -0.005em !important;
+  }
+  /* 各分支颜色 */
+  jmnode.branch-0.level-1 { border-color: var(--branch-1) !important; color: var(--branch-1) !important; }
+  jmnode.branch-1.level-1 { border-color: var(--branch-2) !important; color: var(--branch-2) !important; }
+  jmnode.branch-2.level-1 { border-color: var(--branch-3) !important; color: var(--branch-3) !important; }
+  jmnode.branch-3.level-1 { border-color: var(--branch-4) !important; color: var(--branch-4) !important; }
+  jmnode.branch-4.level-1 { border-color: var(--branch-5) !important; color: var(--branch-5) !important; }
+  jmnode.branch-5.level-1 { border-color: var(--branch-6) !important; color: var(--branch-6) !important; }
+  jmnode.branch-6.level-1 { border-color: var(--branch-7) !important; color: var(--branch-7) !important; }
+  jmnode.branch-7.level-1 { border-color: var(--branch-8) !important; color: var(--branch-8) !important; }
+
+  /* ---- 二级节点 ---- */
+  jmnode.level-2 {
+    font-size: 12.5px !important;
+    font-weight: 500 !important;
+    padding: 6px 14px !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--border-default) !important;
+    background: var(--bg-elevated) !important;
+    color: var(--text-secondary) !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15) !important;
+    line-height: 1.5 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif !important;
+  }
+  jmnode.branch-0.level-2 { border-left: 3px solid var(--branch-1) !important; }
+  jmnode.branch-1.level-2 { border-left: 3px solid var(--branch-2) !important; }
+  jmnode.branch-2.level-2 { border-left: 3px solid var(--branch-3) !important; }
+  jmnode.branch-3.level-2 { border-left: 3px solid var(--branch-4) !important; }
+  jmnode.branch-4.level-2 { border-left: 3px solid var(--branch-5) !important; }
+  jmnode.branch-5.level-2 { border-left: 3px solid var(--branch-6) !important; }
+  jmnode.branch-6.level-2 { border-left: 3px solid var(--branch-7) !important; }
+  jmnode.branch-7.level-2 { border-left: 3px solid var(--branch-8) !important; }
+
+  /* ---- 三级及更深节点 ---- */
+  jmnode.level-3 {
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    padding: 5px 12px !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--border-subtle) !important;
+    background: rgba(24,24,27,0.7) !important;
+    color: var(--text-tertiary) !important;
+    line-height: 1.5 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif !important;
+  }
+
+  jmnode.level-4,
+  jmnode.level-5,
+  jmnode.level-deep {
+    font-size: 11.5px !important;
+    font-weight: 400 !important;
+    padding: 4px 10px !important;
+    border-radius: 5px !important;
+    border: 1px solid var(--border-subtle) !important;
+    background: rgba(15,15,18,0.6) !important;
+    color: var(--text-muted) !important;
+    line-height: 1.45 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif !important;
+  }
+
+  /* ---- 通用节点 hover ---- */
+  jmnode:hover {
+    filter: brightness(1.15) !important;
+    transition: filter 0.15s ease !important;
+  }
+  jmnode.selected {
+    box-shadow: 0 0 0 2px var(--accent), 0 4px 12px rgba(99,102,241,0.2) !important;
+  }
+  jmnode.node-dragging {
+    opacity: 0.8;
+    box-shadow: 0 0 0 2px var(--accent), 0 8px 24px rgba(99,102,241,0.3) !important;
+    z-index: 100 !important;
+    transition: box-shadow 0.1s ease !important;
+  }
+
+  /* ---- 展开/折叠按钮 ---- */
+  jmexpander {
+    width: 18px !important;
+    height: 18px !important;
+    border-radius: 50% !important;
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-default) !important;
+    color: var(--text-muted) !important;
+    font-size: 14px !important;
+    line-height: 16px !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+  }
+  jmexpander:hover {
+    background: var(--accent-subtle) !important;
+    border-color: var(--accent-border) !important;
+    color: var(--accent) !important;
+    transform: scale(1.15) !important;
+  }
+
+  /* 数字高亮 - 在节点内容中的数字 */
+  jmnode .num-highlight {
+    display: inline-block;
+    background: rgba(99,102,241,0.15);
+    color: var(--accent-hover);
+    padding: 0 4px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: inherit;
+  }
+
+  /* 响应式 */
+  @media (max-width: 768px) {
+    .sidebar { width: 100%; min-width: auto; height: 50%; }
+    .main { flex-direction: column; }
+    .mindmap-area { height: 50%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 顶部导航栏 -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      MindFlow
+    </div>
+    <div class="mode-tabs">
+      <button class="mode-tab active" onclick="switchMode('meeting', this)"
+        data-tip="整理会议记录，提取决议和行动项">
+        <span class="tab-dot"></span>会议助手
+      </button>
+      <button class="mode-tab" onclick="switchMode('knowledge', this)"
+        data-tip="整合零散知识点，构建知识体系">
+        <span class="tab-dot"></span>知识碎片
+      </button>
+      <button class="mode-tab" onclick="switchMode('article', this)"
+        data-tip="解析文章内容，提炼核心观点">
+        <span class="tab-dot"></span>文章解析
+      </button>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="btn-icon" onclick="fitMindmap()" title="适应屏幕">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+      </svg>
+    </button>
+    <button class="btn-icon" onclick="expandAll()" title="全部展开">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+        <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+      </svg>
+    </button>
+    <button class="btn-icon" onclick="collapseAll()" title="折叠子节点">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/>
+        <line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/>
+      </svg>
+    </button>
+    <div class="export-wrapper">
+      <button class="btn-icon" onclick="toggleExportMenu(event)" title="导出">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+      </button>
+      <div class="export-menu" id="exportMenu">
+        <div class="export-menu-item" onclick="exportAs('png')">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          导出为 PNG 图片
+        </div>
+        <div class="export-menu-item" onclick="exportAs('markdown')">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 15V9l4 4 4-4v6"/></svg>
+          导出为 Markdown
+        </div>
+        <div class="export-menu-item" onclick="exportAs('json')">
+          <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          导出为 JSON
+        </div>
+      </div>
+    </div>
+    <div class="topbar-divider"></div>
+    <button class="btn-icon" onclick="toggleSettings()" title="设置">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+    </button>
+    <button class="btn-icon" onclick="clearAll()" title="清空当前">
+      <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- 主体 -->
+<div class="main">
+  <!-- 左侧面板 -->
+  <div class="sidebar">
+
+    <!-- 历史记录区 -->
+    <div class="history-section" id="historySection">
+      <div class="history-header" onclick="toggleHistory()">
+        <div class="history-header-left">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted)">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span id="historyLabel">历史记录</span>
+          <span class="history-count" id="historyCount">0</span>
+        </div>
+        <svg class="history-chevron" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="history-empty" id="historyEmpty">还没有历史记录</div>
+      </div>
+    </div>
+
+    <!-- 侧边栏标题 -->
+    <div class="sidebar-header">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <div style="flex: 1;">
+          <h3 id="modeTitle" style="margin-bottom: 2px;">会议助手</h3>
+          <p id="modeDesc" style="font-size: 11px; color: var(--text-tertiary); line-height: 1.5; margin: 0;">点击麦克风开始录音，或直接输入内容。AI 会实时生成思维导图。</p>
+        </div>
+        <!-- 移动端折叠按钮 -->
+        <button class="btn-icon" onclick="toggleSidebar()" title="收起/展开侧边栏" style="flex-shrink: 0;" id="sidebarToggleBtn">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 会议控制 -->
+    <div class="meeting-controls show" id="meetingControls">
+      <button class="meeting-type-btn active" onclick="setMeetingType('general', this)">常规会议</button>
+      <button class="meeting-type-btn" onclick="setMeetingType('brainstorm', this)">发散讨论</button>
+      <button class="meeting-type-btn" onclick="setMeetingType('report', this)">汇报总结</button>
+      <input class="meeting-goal" id="meetingGoal" placeholder="输入会议目标，AI 将生成讨论框架..." />
+    </div>
+
+    <!-- 聊天区 -->
+    <div class="input-area">
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="input-box">
+        <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()" title="语音输入">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </button>
+        <textarea id="userInput" placeholder="输入内容，Enter 发送，Shift+Enter 换行..." rows="1"
+          onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
+        <button class="btn-send" id="sendBtn" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 语音波形动画 -->
+  <div class="voice-waveform" id="voiceWaveform">
+    <div class="voice-waveform-bar"></div>
+    <div class="voice-waveform-bar"></div>
+    <div class="voice-waveform-bar"></div>
+    <div class="voice-waveform-bar"></div>
+    <div class="voice-waveform-bar"></div>
+    <span class="voice-waveform-text">录音中...</span>
+  </div>
+
+  <!-- 右侧导图区域 -->
+  <div class="mindmap-area" id="mindmapArea">
+    <div id="jsmind_container"></div>
+
+    <!-- 空状态引导 -->
+    <div class="mindmap-placeholder" id="placeholder">
+      <div class="placeholder-icon">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><line x1="3" y1="12" x2="9" y2="12"/>
+          <line x1="15" y1="12" x2="21" y2="12"/><line x1="12" y1="3" x2="12" y2="9"/>
+          <line x1="12" y1="15" x2="12" y2="21"/>
+        </svg>
+      </div>
+      <h4>开始创建思维导图</h4>
+      <p>在左侧输入内容，AI 会自动生成<br>结构化的思维导图</p>
+      <div class="placeholder-tips" id="placeholderTips">
+        <div class="placeholder-tip" onclick="fillExample('meeting')">
+          <span class="placeholder-tip-icon">🎯</span>
+          <div class="placeholder-tip-text">
+            <strong>会议助手 — 试试这个</strong>
+            今天讨论了 Q2 目标，提升 DAU 30%，负责人张三；确定了新功能上线时间表
+          </div>
+        </div>
+        <div class="placeholder-tip" onclick="fillExample('knowledge')">
+          <span class="placeholder-tip-icon">💡</span>
+          <div class="placeholder-tip-text">
+            <strong>知识碎片 — 试试这个</strong>
+            费曼学习法：用简单语言解释概念；番茄工作法：25分钟专注+5分钟休息
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 缩放控件 -->
+    <div class="zoom-controls" id="zoomControls" style="display:none">
+      <button class="zoom-btn" onclick="zoomIn()" title="放大">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <div class="zoom-level" id="zoomLevel">100%</div>
+      <button class="zoom-btn" onclick="zoomOut()" title="缩小">
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button class="zoom-btn" onclick="fitMindmap()" title="适应屏幕" style="margin-top:4px">
+        <svg viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+    </div>
+
+    <!-- 思维碰撞面板 -->
+    <div class="spark-panel" id="sparkPanel">
+      <h4>💡 思维碰撞</h4>
+      <div id="sparkList"></div>
+    </div>
+
+    <!-- 节点右键菜单 -->
+    <div class="node-context-menu" id="nodeContextMenu">
+      <button onclick="nodeAddChild()" title="添加子节点">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="12" y1="5" x2="12" y2="19"/></svg>
+        添加子节点
+      </button>
+      <button onclick="nodeEditSelected()" title="编辑节点">
+        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        编辑节点
+      </button>
+      <div class="menu-divider"></div>
+      <button class="danger" onclick="nodeDeleteSelected()" title="删除节点">
+        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        删除节点
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 设置模态框 -->
+<div class="settings-overlay" id="settingsOverlay" onclick="toggleSettings()"></div>
+<div class="settings-modal" id="settingsModal">
+  <h3>设置</h3>
+  <p class="subtitle">配置 API 连接参数，修改后点击保存</p>
+  <div class="setting-group">
+    <label>API Key（可选）</label>
+    <input type="password" id="apiKey" placeholder="sk-xxxxxx（留空则使用代理内置 Key）" />
+    <div class="setting-hint">从阿里云百炼平台获取，或留空使用代理内置 Key</div>
+  </div>
+  <div class="setting-group">
+    <label>API 代理地址 <span style="color:var(--danger);font-size:10px">必填</span></label>
+    <input type="text" id="proxyUrl" placeholder="https://xxx.cn-hangzhou.fcapp.run" />
+    <div class="setting-hint">阿里云函数计算 FC 的公网地址</div>
+  </div>
+  <div class="setting-group">
+    <label>AI 模型</label>
+    <select id="modelSelect">
+      <option value="qwen-turbo">Qwen Turbo — 快速经济</option>
+      <option value="qwen-plus">Qwen Plus — 均衡推荐</option>
+      <option value="qwen-max">Qwen Max — 最强效果</option>
+    </select>
+  </div>
+  <div class="settings-actions">
+    <button class="btn-secondary" onclick="toggleSettings()">取消</button>
+    <button class="btn-primary" onclick="saveSettings()">保存设置</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== 全局状态 ====================
+const State = {
+  mode: 'meeting',
+  meetingType: 'general',
+  isRecording: false,
+  jm: null,
+  mindmapData: null,
+  chatHistory: [],
+  transcript: '',
+  isProcessing: false,
+  currentHistoryId: null,
+  zoomScale: 1.0,
+  // 画布拖拽状态
+  isDragging: false,
+  dragStartX: 0,
+  dragStartY: 0,
+  dragOffsetX: 0,
+  dragOffsetY: 0,
+  contextMenuNodeId: null,
+  // 节点拖拽
+  nodeDragging: false,
+  nodeDragTarget: null,       // DOM 引用
+  nodeDragNodeId: null,       // jsMind node id
+  nodeDragStartX: 0,
+  nodeDragStartY: 0,
+  nodeDragOrigX: 0,
+  nodeDragOrigY: 0,
+  // 撤销栈
+  undoStack: [],
+  // 复制剪贴板
+  clipboard: null,            // { id, topic, data }
+};
+
+const HISTORY_KEYS = {
+  meeting: 'mindflow_history_meeting',
+  knowledge: 'mindflow_history_knowledge',
+  article: 'mindflow_history_article'
+};
+const MAX_HISTORY = 20;
+
+const MODE_EMOJI = { meeting: '🎯', knowledge: '💡', article: '📄' };
+const MODE_NAMES = { meeting: '会议助手', knowledge: '知识碎片', article: '文章解析' };
+
+// 分支颜色列表
+const BRANCH_COLORS = [
+  '#6366f1', '#06b6d4', '#f59e0b', '#10b981',
+  '#f43f5e', '#8b5cf6', '#ec4899', '#14b8a6'
+];
+
+// ==================== 初始化 ====================
+function init() {
+  const savedApiKey = localStorage.getItem('mindflow_apikey');
+  const savedProxy = localStorage.getItem('mindflow_proxy');
+  const savedModel = localStorage.getItem('mindflow_model');
+  if (savedApiKey) document.getElementById('apiKey').value = savedApiKey;
+  if (savedProxy) document.getElementById('proxyUrl').value = savedProxy;
+  if (savedModel) document.getElementById('modelSelect').value = savedModel;
+
+  renderHistoryList();
+  setupMindmapInteraction();
+  
+  document.addEventListener('click', function(e) {
+    const menu = document.getElementById('exportMenu');
+    if (!e.target.closest('.export-wrapper')) {
+      menu.classList.remove('show');
+    }
+  });
+
+  // 加载 Demo 数据测试
+  if (new URLSearchParams(window.location.search).has('demo')) {
+    setTimeout(() => renderDemoMindmap(), 500);
+  }
+  
+  // 移动端：检测屏幕宽度，自动折叠侧边栏
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebarToggleBtn').innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><polyline points="18 15 12 9 6 15"/></svg>';
+  }
+}
+
+// ==================== 侧边栏切换（移动端）====================
+function toggleSidebar() {
+  const sidebar = document.getElementById('historySection').closest('.sidebar');
+  const toggleBtn = document.getElementById('sidebarToggleBtn');
+  
+  if (!sidebar) return;
+  
+  sidebar.classList.toggle('collapsed');
+  
+  // 切换箭头方向
+  if (sidebar.classList.contains('collapsed')) {
+    toggleBtn.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><polyline points="18 15 12 9 6 15"/></svg>';
+  } else {
+    toggleBtn.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;"><polyline points="6 9 12 15 18 9"/></svg>';
+  }
+  
+  // 触发布局重绘
+  setTimeout(() => {
+    if (State.jm) {
+      try { State.jm.relayout(); } catch(e) {}
+    }
+  }, 300);
+}
+
+// ==================== Demo 导图（自测用）====================
+function renderDemoMindmap() {
+  const demoData = {
+    topic: "Q2 产品战略：从流量思维转向留存驱动",
+    children: [
+      {
+        topic: "📈 增长逻辑重构",
+        children: [
+          { topic: "拉新红利见顶，存量竞争是主战场", children: [] },
+          { topic: "留存率每提升 5%，LTV 提升 30%", children: [] },
+          { topic: "社区裂变是最低成本的增长杠杆", children: [] }
+        ]
+      },
+      {
+        topic: "🔧 产品方向聚焦",
+        children: [
+          { topic: "砍掉长尾功能，集中资源打透核心场景", children: [] },
+          { topic: "推荐算法是体验差异化的关键", children: [] }
+        ]
+      },
+      {
+        topic: "👥 组织能力升级",
+        children: [
+          { topic: "前端产能不足是最大瓶颈", children: [] },
+          { topic: "AI 工程化能力需要补齐", children: [] }
+        ]
+      },
+      {
+        topic: "💰 资源分配逻辑",
+        children: [
+          { topic: "研发投入 > 60%，确保产品竞争力", children: [] },
+          { topic: "品牌投放收缩，转向效果可追踪的渠道", children: [] }
+        ]
+      }
+    ]
+  };
+
+  // 切换到会议模式
+  State.mode = 'meeting';
+  renderMindmap(demoData);
+  addMessage('ai', '✅ Demo 导图已加载，体验新视觉效果。');
+  saveCurrentToHistory(demoData.topic);
+}
+
+// ==================== 历史记录系统（按模式分离） ====================
+function getHistory(mode) {
+  mode = mode || State.mode;
+  const key = HISTORY_KEYS[mode] || HISTORY_KEYS.meeting;
+  try { return JSON.parse(localStorage.getItem(key) || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveHistory(list, mode) {
+  mode = mode || State.mode;
+  const key = HISTORY_KEYS[mode] || HISTORY_KEYS.meeting;
+  localStorage.setItem(key, JSON.stringify(list));
+}
+
+function saveCurrentToHistory(title) {
+  if (!State.mindmapData) return;
+  const list = getHistory(State.mode);
+  const item = {
+    id: State.currentHistoryId || ('h_' + Date.now()),
+    title: title || State.mindmapData.topic || '无标题',
+    mode: State.mode,
+    emoji: MODE_EMOJI[State.mode],
+    data: State.mindmapData,
+    chat: State.chatHistory.slice(-20),
+    time: new Date().toISOString(),
+  };
+
+  const existIdx = list.findIndex(h => h.id === item.id);
+  if (existIdx >= 0) {
+    list[existIdx] = item;
+  } else {
+    list.unshift(item);
+    if (list.length > MAX_HISTORY) list.pop();
+  }
+
+  State.currentHistoryId = item.id;
+  saveHistory(list, State.mode);
+  renderHistoryList();
+}
+
+function renderHistoryList() {
+  const list = getHistory(State.mode);
+  const container = document.getElementById('historyList');
+  const empty = document.getElementById('historyEmpty');
+  const count = document.getElementById('historyCount');
+  const label = document.getElementById('historyLabel');
+  label.textContent = MODE_NAMES[State.mode] + '记录';
+  count.textContent = list.length;
+  Array.from(container.children).forEach(c => { if (c !== empty) c.remove(); });
+  
+  if (list.length === 0) { empty.style.display = ''; return; }
+  empty.style.display = 'none';
+
+  list.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'history-item' + (item.id === State.currentHistoryId ? ' active' : '');
+    div.dataset.id = item.id;
+    const timeStr = formatRelativeTime(item.time);
+    div.innerHTML = `
+      <div class="history-item-icon">${item.emoji || '📋'}</div>
+      <div class="history-item-info">
+        <div class="history-item-title">${escHtml(item.title)}</div>
+        <div class="history-item-meta">${escHtml(MODE_NAMES[item.mode] || item.mode)} · ${timeStr}</div>
+      </div>
+      <button class="history-item-del" onclick="deleteHistory('${item.id}', event)" title="删除">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    `;
+    div.addEventListener('click', () => loadHistoryItem(item.id));
+    container.appendChild(div);
+  });
+}
+
+function loadHistoryItem(id) {
+  if (State.isProcessing) { showToast('正在处理中，请稍候'); return; }
+  const list = getHistory(State.mode);
+  const item = list.find(h => h.id === id);
+  if (!item) return;
+
+  const modeTabMap = { meeting: 0, knowledge: 1, article: 2 };
+  const tabs = document.querySelectorAll('.mode-tab');
+  tabs.forEach(t => t.classList.remove('active'));
+  if (tabs[modeTabMap[item.mode]]) tabs[modeTabMap[item.mode]].classList.add('active');
+
+  State.mode = item.mode;
+  State.currentHistoryId = id;
+  State.mindmapData = item.data;
+  State.chatHistory = item.chat || [];
+  State.transcript = '';
+
+  const title = document.getElementById('modeTitle');
+  const desc = document.getElementById('modeDesc');
+  const controls = document.getElementById('meetingControls');
+  const goalInput = document.getElementById('meetingGoal');
+  
+  switch(item.mode) {
+    case 'meeting':
+      title.textContent = '会议助手'; desc.textContent = '点击麦克风开始录音，或直接输入内容。AI 会实时生成思维导图。';
+      controls.classList.add('show'); break;
+    case 'knowledge':
+      title.textContent = '知识碎片'; desc.textContent = '输入零散的知识点和灵感，AI 自动整合成结构化的知识树。';
+      controls.classList.remove('show'); break;
+    case 'article':
+      title.textContent = '文章解析'; desc.textContent = '粘贴文章内容或链接，AI 提取关键知识点并生成思维导图。';
+      controls.classList.remove('show'); break;
+  }
+
+  const input = document.getElementById('userInput');
+  const placeholders = { meeting: '记录会议要点或补充内容...', knowledge: '输入碎片知识点、灵感、关键词...', article: '粘贴文章内容或链接...' };
+  input.placeholder = placeholders[item.mode];
+
+  goalInput.value = '';
+  goalInput.classList.remove('show');
+  document.getElementById('sparkPanel').classList.remove('show');
+
+  const chatContainer = document.getElementById('chatMessages');
+  chatContainer.innerHTML = '';
+  const recentChat = State.chatHistory.slice(-10);
+  recentChat.forEach((msg, i) => {
+    if (i % 2 === 0) addMessage('user', msg.content);
+    else addMessage('ai', msg.content);
+  });
+
+  renderMindmap(item.data);
+  renderHistoryList();
+  showToast('已恢复：' + item.title);
+}
+
+function deleteHistory(id, event) {
+  event.stopPropagation();
+  const list = getHistory(State.mode).filter(h => h.id !== id);
+  saveHistory(list, State.mode);
+  if (State.currentHistoryId === id) State.currentHistoryId = null;
+  renderHistoryList();
+  showToast('已删除');
+}
+
+function toggleHistory() {
+  document.getElementById('historySection').classList.toggle('open');
+}
+
+function formatRelativeTime(isoStr) {
+  const now = new Date();
+  const d = new Date(isoStr);
+  const diff = Math.floor((now - d) / 1000);
+  if (diff < 60) return '刚刚';
+  if (diff < 3600) return Math.floor(diff/60) + ' 分钟前';
+  if (diff < 86400) return Math.floor(diff/3600) + ' 小时前';
+  if (diff < 604800) return Math.floor(diff/86400) + ' 天前';
+  return d.toLocaleDateString('zh-CN', { month:'short', day:'numeric' });
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ==================== 导图缩放 + 画布拖拽 ====================
+function setupMindmapInteraction() {
+  const area = document.getElementById('mindmapArea');
+  
+  // 滚轮缩放
+  area.addEventListener('wheel', function(e) {
+    if (!State.jm) return;
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.08 : 0.08;
+    const newScale = Math.max(0.2, Math.min(3.0, State.zoomScale + delta));
+    applyZoom(newScale);
+  }, { passive: false });
+
+  // 画布拖拽平移
+  area.addEventListener('mousedown', function(e) {
+    // 排除节点、expander、右键菜单、zoom 控件等交互元素，其余区域触发拖拽
+    const tag = e.target.tagName;
+    const isInteractive = e.target.closest('jmnode') || e.target.closest('jmexpander')
+      || e.target.closest('.zoom-controls') || e.target.closest('.spark-panel')
+      || e.target.closest('.node-context-menu');
+    if (!isInteractive) {
+      State.isDragging = true;
+      State.dragStartX = e.clientX - State.dragOffsetX;
+      State.dragStartY = e.clientY - State.dragOffsetY;
+      area.classList.add('dragging');
+      e.preventDefault();
+    }
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!State.isDragging) return;
+    const dx = e.clientX - State.dragStartX;
+    const dy = e.clientY - State.dragStartY;
+    State.dragOffsetX = dx;
+    State.dragOffsetY = dy;
+    try {
+      const inner = document.querySelector('.jsmind-inner');
+      if (inner) {
+        inner.style.transformOrigin = '0 0';
+        inner.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + State.zoomScale + ')';
+      }
+    } catch(e2) {}
+  });
+
+  document.addEventListener('mouseup', function() {
+    if (State.isDragging) {
+      State.isDragging = false;
+      document.getElementById('mindmapArea').classList.remove('dragging');
+    }
+  });
+  
+  // ==================== 双击编辑节点 ====================
+  area.addEventListener('dblclick', function(e) {
+    if (!State.jm) return;
+    
+    const jmnode = e.target.closest('jmnode');
+    if (jmnode) {
+      const nodeId = jmnode.getAttribute('nodeid');
+      if (nodeId) {
+        try {
+          State.jm.edit_node(nodeId);
+        } catch(err) {
+          console.error('双击编辑失败:', err);
+        }
+      }
+    }
+  });
+
+  // 节点右键菜单
+  area.addEventListener('contextmenu', function(e) {
+    const jmnode = e.target.closest('jmnode');
+    if (jmnode && State.jm) {
+      e.preventDefault();
+      const nodeId = jmnode.getAttribute('nodeid');
+      if (nodeId) {
+        State.jm.select_node(nodeId);
+        showNodeContextMenu(e.clientX, e.clientY, nodeId);
+      }
+    }
+  });
+
+  // 点击空白处关闭菜单
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.node-context-menu')) {
+      hideNodeContextMenu();
+    }
+  });
+
+  // ==================== 快捷键系统 ====================
+  document.addEventListener('keydown', function(e) {
+    if (!State.jm) return;
+    const activeEl = document.activeElement;
+    // 正在编辑节点文本时，不拦截快捷键（除了 Escape）
+    if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) {
+      if (e.key === 'Escape') activeEl.blur();
+      return;
+    }
+
+    const selected = State.jm.get_selected_node();
+    const hasSelection = selected && selected.parent; // 有选中且不是根节点
+
+    // Ctrl+Z / Cmd+Z — 撤销
+    if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+      e.preventDefault();
+      undoAction();
+      return;
+    }
+
+    // Ctrl+C / Cmd+C — 复制节点
+    if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+      if (selected) {
+        e.preventDefault();
+        State.clipboard = { id: selected.id, topic: selected.topic };
+        showToast('已复制: ' + selected.topic.substring(0, 20));
+      }
+      return;
+    }
+
+    // Ctrl+V / Cmd+V — 粘贴为子节点
+    if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+      if (selected && State.clipboard) {
+        e.preventDefault();
+        pasteNode(selected.id);
+      }
+      return;
+    }
+
+    // Ctrl+X / Cmd+X — 剪切节点（复制+删除）
+    if ((e.ctrlKey || e.metaKey) && e.key === 'x') {
+      if (hasSelection) {
+        e.preventDefault();
+        State.clipboard = { id: selected.id, topic: selected.topic, cut: true };
+        // 保存撤销信息 — 用 selected.parent.id 而不是 ._data.id
+        const parentId = selected.parent.id || (selected.parent._data ? selected.parent._data.id : null);
+        pushUndo({ type: 'remove', parentId: parentId, nodeData: cloneNodeData(selected) });
+        State.jm.remove_node(selected.id);
+        hideNodeContextMenu();
+        showToast('已剪切: ' + selected.topic.substring(0, 20));
+      }
+      return;
+    }
+
+    // Tab — 添加子节点
+    if (e.key === 'Tab' && selected) {
+      e.preventDefault();
+      addSubNode(selected.id);
+      return;
+    }
+
+    // Enter — 编辑选中节点
+    if (e.key === 'Enter' && selected) {
+      e.preventDefault();
+      try { State.jm.edit_node(selected.id); } catch(err) {}
+      return;
+    }
+
+    // F2 — 编辑选中节点（和 Enter 一样）
+    if (e.key === 'F2' && selected) {
+      e.preventDefault();
+      try { State.jm.edit_node(selected.id); } catch(err) {}
+      return;
+    }
+
+    // Delete / Backspace — 删除选中节点
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      if (hasSelection) {
+        e.preventDefault();
+        // 保存撤销信息 — 用 selected.parent.id 而不是 ._data.id
+        const parentId = selected.parent.id || (selected.parent._data ? selected.parent._data.id : null);
+        pushUndo({ type: 'remove', parentId: parentId, nodeData: cloneNodeData(selected) });
+        try {
+          State.jm.remove_node(selected.id);
+          hideNodeContextMenu();
+          showToast('已删除 (Ctrl+Z 撤销)');
+        } catch(err) {
+          showToast('删除失败', 'error');
+        }
+      }
+      return;
+    }
+  });
+
+  // 节点拖拽移动位置
+  // 用事件委托监听 container 上的 jmnode mousedown
+  const container = document.getElementById('jsmind_container');
+
+  container.addEventListener('mousedown', function(e) {
+    const jmnode = e.target.closest('jmnode');
+    if (!jmnode || !State.jm) return;
+    const nodeId = jmnode.getAttribute('nodeid');
+    if (!nodeId) return;
+
+    // 选中节点
+    try { State.jm.select_node(nodeId); } catch(err) {}
+
+    // 记录起始位置 — 直接从 DOM 读取，兼容性好
+    const nodeLeft = parseInt(jmnode.style.left) || 0;
+    const nodeTop = parseInt(jmnode.style.top) || 0;
+
+    State.nodeDragging = true;
+    State.nodeDragTarget = jmnode;       // 存 DOM 引用而不是 ID
+    State.nodeDragStartX = e.clientX;
+    State.nodeDragStartY = e.clientY;
+    State.nodeDragOrigX = nodeLeft;
+    State.nodeDragOrigY = nodeTop;
+    State.nodeDragNodeId = nodeId;
+    jmnode.classList.add('node-dragging');
+    e.preventDefault();
+    e.stopPropagation();  // 阻止 jsMind 内部处理和画布拖拽
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!State.nodeDragging || !State.nodeDragTarget) return;
+    e.preventDefault();
+    const dx = e.clientX - State.nodeDragStartX;
+    const dy = e.clientY - State.nodeDragStartY;
+    const newLeft = State.nodeDragOrigX + dx;
+    const newTop = State.nodeDragOrigY + dy;
+    State.nodeDragTarget.style.left = newLeft + 'px';
+    State.nodeDragTarget.style.top = newTop + 'px';
+  });
+
+  document.addEventListener('mouseup', function(e) {
+    if (!State.nodeDragging) return;
+    if (State.nodeDragTarget) {
+      State.nodeDragTarget.classList.remove('node-dragging');
+      // 同步更新 jsMind 内部数据
+      try {
+        const node = State.jm.get_node(State.nodeDragNodeId);
+        if (node) {
+          node.x = parseInt(State.nodeDragTarget.style.left) || 0;
+          node.y = parseInt(State.nodeDragTarget.style.top) || 0;
+        }
+      } catch(err) {}
+    }
+    State.nodeDragging = false;
+    State.nodeDragTarget = null;
+    State.nodeDragNodeId = null;
+  });
+}
+
+function showNodeContextMenu(x, y, nodeId) {
+  const menu = document.getElementById('nodeContextMenu');
+  // 防止菜单溢出屏幕
+  const menuW = 150, menuH = 120;
+  if (x + menuW > window.innerWidth) x = window.innerWidth - menuW;
+  if (y + menuH > window.innerHeight) y = window.innerHeight - menuH;
+  menu.style.left = x + 'px';
+  menu.style.top = y + 'px';
+  menu.classList.add('show');
+  State.contextMenuNodeId = nodeId;
+}
+
+function hideNodeContextMenu() {
+  document.getElementById('nodeContextMenu').classList.remove('show');
+  State.contextMenuNodeId = null;
+}
+
+// 节点操作函数
+function nodeAddChild() {
+  if (!State.jm || !State.contextMenuNodeId) return;
+  hideNodeContextMenu();
+  const selectedNode = State.jm.get_node(State.contextMenuNodeId);
+  if (!selectedNode) return;
+  const newNodeId = 'node_' + Date.now();
+  try {
+    State.jm.add_node(State.contextMenuNodeId, newNodeId, '新主题');
+    State.jm.select_node(newNodeId);
+    // 自动进入编辑
+    setTimeout(() => { try { State.jm.edit_node(newNodeId); } catch(e) {} }, 100);
+  } catch(e) {
+    showToast('添加失败: ' + e.message, 'error');
+  }
+}
+
+function nodeEditSelected() {
+  if (!State.jm || !State.contextMenuNodeId) return;
+  hideNodeContextMenu();
+  try {
+    State.jm.edit_node(State.contextMenuNodeId);
+  } catch(e) {
+    showToast('编辑失败: ' + e.message, 'error');
+  }
+}
+
+function nodeDeleteSelected() {
+  if (!State.jm || !State.contextMenuNodeId) return;
+  hideNodeContextMenu();
+  const node = State.jm.get_node(State.contextMenuNodeId);
+  if (!node) return;
+  if (!node.parent) {
+    showToast('根节点不能删除', 'error');
+    return;
+  }
+  const parentId = node.parent.id || (node.parent._data ? node.parent._data.id : null);
+  pushUndo({ type: 'remove', parentId: parentId, nodeData: cloneNodeData(node) });
+  try {
+    State.jm.remove_node(State.contextMenuNodeId);
+    showToast('已删除 (Ctrl+Z 撤销)');
+  } catch(e) {
+    showToast('删除失败', 'error');
+  }
+}
+
+// ==================== 撤销系统 ====================
+function cloneNodeData(node) {
+  if (!node) return null;
+  // jsMind 节点结构：node._data 包含 id/topic/class，node.children 是子节点数组
+  // 每个子节点也有 _data 属性
+  const data = {
+    id: node._data ? node._data.id : node.id,
+    topic: node.topic,
+  };
+  // 保存 CSS class 信息
+  if (node._data && node._data['class']) {
+    data['class'] = node._data['class'];
+  }
+  data.children = [];
+  if (node.children && node.children.length > 0) {
+    node.children.forEach(function(child) {
+      const cloned = cloneNodeData(child);
+      if (cloned) data.children.push(cloned);
+    });
+  }
+  return data;
+}
+
+function pushUndo(action) {
+  State.undoStack.push(action);
+  if (State.undoStack.length > 50) State.undoStack.shift();
+}
+
+function undoAction() {
+  if (!State.jm || State.undoStack.length === 0) {
+    showToast('没有可撤销的操作');
+    return;
+  }
+  const action = State.undoStack.pop();
+  try {
+    if (action.type === 'remove') {
+      restoreNode(action.parentId, action.nodeData);
+      showToast('已撤销删除');
+    }
+  } catch(err) {
+    showToast('撤销失败: ' + err.message, 'error');
+  }
+}
+
+function restoreNode(parentId, data) {
+  if (!State.jm || !data) return;
+  
+  // 第一步：找到父节点
+  let parentNode = null;
+  try {
+    parentNode = State.jm.get_node(parentId);
+  } catch(e) {}
+
+  // 如果父节点不存在（可能也被删了），回退到根节点
+  if (!parentNode) {
+    try {
+      parentNode = State.jm.get_root();
+    } catch(e) {}
+  }
+  if (!parentNode) {
+    showToast('撤销失败：无法找到父节点', 'error');
+    return;
+  }
+
+  const actualParentId = parentNode.id;
+
+  // 检查节点 ID 是否已存在（避免冲突）
+  let nodeId = data.id;
+  try {
+    const existing = State.jm.get_node(nodeId);
+    if (existing) {
+      nodeId = nodeId + '_undo_' + Date.now();
+    }
+  } catch(e) {}
+
+  // 第二步：添加节点
+  try {
+    // jsMind add_node(parentId, nodeId, topic)
+    State.jm.add_node(actualParentId, nodeId, data.topic);
+  } catch(err) {
+    // 如果 add_node 失败，尝试直接添加到根节点
+    try {
+      const root = State.jm.get_root();
+      const safeId = nodeId + '_root_' + Date.now();
+      State.jm.add_node(root.id, safeId, data.topic);
+      nodeId = safeId;
+    } catch(err2) {
+      showToast('撤销失败: ' + err2.message, 'error');
+      return;
+    }
+  }
+
+  // 第三步：恢复 CSS class（通过 DOM）
+  if (data['class']) {
+    setTimeout(function() {
+      try {
+        const domNode = document.querySelector('jmnode[nodeid="' + nodeId + '"]');
+        if (domNode) {
+          data['class'].split(' ').forEach(function(cls) {
+            if (cls) domNode.classList.add(cls);
+          });
+        }
+      } catch(e) {}
+    }, 50);
+  }
+
+  // 第四步：选中恢复的节点
+  try { State.jm.select_node(nodeId); } catch(e) {}
+
+  // 第五步：递归恢复子节点
+  if (data.children && data.children.length > 0) {
+    data.children.forEach(function(child) {
+      restoreNode(nodeId, child);
+    });
+  }
+}
+
+// ==================== 复制粘贴系统 ====================
+function addSubNode(parentId) {
+  if (!State.jm) return;
+  const newNodeId = 'node_' + Date.now();
+  try {
+    State.jm.add_node(parentId, newNodeId, '新主题');
+    State.jm.select_node(newNodeId);
+    setTimeout(() => { try { State.jm.edit_node(newNodeId); } catch(e) {} }, 100);
+  } catch(err) {
+    showToast('添加失败', 'error');
+  }
+}
+
+function pasteNode(targetId) {
+  if (!State.jm || !State.clipboard) return;
+  const newNodeId = 'node_' + Date.now();
+  try {
+    State.jm.add_node(targetId, newNodeId, State.clipboard.topic);
+    State.jm.select_node(newNodeId);
+    showToast('已粘贴');
+  } catch(err) {
+    showToast('粘贴失败', 'error');
+  }
+}
+
+function applyZoom(scale) {
+  if (!State.jm) return;
+  State.zoomScale = scale;
+  try {
+    State.jm.view.setZoom(scale);
+  } catch(e) {
+    const inner = document.querySelector('.jsmind-inner');
+    if (inner) {
+      inner.style.transformOrigin = '0 0';
+      inner.style.transform = 'translate(' + State.dragOffsetX + 'px,' + State.dragOffsetY + 'px) scale(' + scale + ')';
+    }
+  }
+  document.getElementById('zoomLevel').textContent = Math.round(scale * 100) + '%';
+}
+
+function zoomIn() { applyZoom(Math.min(3.0, State.zoomScale + 0.15)); }
+function zoomOut() { applyZoom(Math.max(0.2, State.zoomScale - 0.15)); }
+
+function fitMindmap() {
+  if (!State.jm) return;
+  State.dragOffsetX = 0;
+  State.dragOffsetY = 0;
+  try {
+    State.jm.view.reset_zoom();
+    State.zoomScale = 1.0;
+    const inner = document.querySelector('.jsmind-inner');
+    if (inner) inner.style.transform = 'scale(1)';
+  } catch(e) { applyZoom(1.0); }
+  document.getElementById('zoomLevel').textContent = '100%';
+}
+
+// ==================== 全部展开/折叠 ====================
+function expandAll() {
+  if (!State.jm) return;
+  try {
+    const nodes = State.jm.mind.nodes;
+    for (const key in nodes) {
+      if (nodes[key]) {
+        nodes[key].collapsed = false;
+      }
+    }
+    State.jm.relayout();
+    State.jm.refresh();
+    showToast('已全部展开');
+  } catch(e) {
+    showToast('展开失败', 'error');
+  }
+}
+
+function collapseAll() {
+  if (!State.jm) return;
+  try {
+    const nodes = State.jm.mind.nodes;
+    const rootKey = State.jm.mind.root?.id || '';
+    for (const key in nodes) {
+      if (nodes[key] && key !== rootKey) {
+        // 只折叠一级节点（保留根节点和一级节点可见）
+        const node = nodes[key];
+        if (node._data && node._data.level === 1) {
+          node.collapsed = true;
+        }
+      }
+    }
+    State.jm.relayout();
+    State.jm.refresh();
+    showToast('已折叠子节点');
+  } catch(e) {
+    showToast('折叠失败', 'error');
+  }
+}
+
+// ==================== 导出菜单 ====================
+function toggleExportMenu(e) {
+  e.stopPropagation();
+  document.getElementById('exportMenu').classList.toggle('show');
+}
+
+function exportAs(type) {
+  document.getElementById('exportMenu').classList.remove('show');
+  if (!State.mindmapData) { showToast('没有可导出的导图', 'error'); return; }
+
+  if (type === 'json') {
+    downloadText(JSON.stringify(State.mindmapData, null, 2), 'mindflow_' + getDateStr() + '.json', 'application/json');
+    showToast('已导出 JSON');
+  } else if (type === 'markdown') {
+    const md = convertToMarkdown(State.mindmapData);
+    downloadText(md, 'mindflow_' + getDateStr() + '.md', 'text/markdown');
+    showToast('已导出 Markdown');
+  } else if (type === 'png') {
+    exportToPng();
+  }
+}
+
+function convertToMarkdown(node, depth) {
+  depth = depth || 0;
+  const prefix = depth === 0 ? '# ' : '  '.repeat(depth - 1) + '- ';
+  let md = prefix + (node.topic || '') + '\n';
+  if (node.children && node.children.length > 0) {
+    node.children.forEach(child => { md += convertToMarkdown(child, depth + 1); });
+  }
+  return md;
+}
+
+function exportToPng() {
+  showToast('正在生成图片...');
+  try {
+    const canvas = document.querySelector('#jsmind_container canvas');
+    if (canvas) {
+      canvas.toBlob(function(blob) {
+        if (!blob) { fallbackPngExport(); return; }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'mindflow_' + getDateStr() + '.png';
+        a.click(); URL.revokeObjectURL(url);
+        showToast('已导出 PNG 图片');
+      });
+    } else {
+      fallbackPngExport();
+    }
+  } catch(e) { fallbackPngExport(); }
+}
+
+function fallbackPngExport() {
+  const container = document.getElementById('jsmind_container');
+  const rect = container.getBoundingClientRect();
+  const svgStr = '<svg xmlns="http://www.w3.org/2000/svg" width="' + rect.width + '" height="' + rect.height + '"><foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml" style="background:#09090b;padding:20px">' + container.innerHTML + '</div></foreignObject></svg>';
+  const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'mindflow_' + getDateStr() + '.svg';
+  a.click(); URL.revokeObjectURL(url);
+  showToast('已导出 SVG 图片（更高质量）');
+}
+
+function downloadText(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function getDateStr() { return new Date().toISOString().slice(0, 10); }
+
+// ==================== 示例填充 ====================
+function fillExample(mode) {
+  const examples = {
+    meeting: '今天讨论了 Q2 目标，提升 DAU 30%，负责人张三，截止 6 月 30 日；确定了新功能上线时间表，A 功能 4 月 15 日，B 功能 5 月 1 日；技术债务清理需要额外 2 周，已批准',
+    knowledge: '费曼学习法：用简单语言解释概念，能讲清楚才算真的懂；番茄工作法：25 分钟专注 + 5 分钟休息，四个番茄后长休息 15-30 分钟；GTD：收集、明确、组织、回顾、行动五步骤',
+  };
+  
+  const tabs = document.querySelectorAll('.mode-tab');
+  const modeIdx = { meeting: 0, knowledge: 1, article: 2 };
+  tabs.forEach(t => t.classList.remove('active'));
+  tabs[modeIdx[mode]].classList.add('active');
+  switchMode(mode, null, true);
+  
+  document.getElementById('userInput').value = examples[mode] || '';
+  autoResize(document.getElementById('userInput'));
+  document.getElementById('userInput').focus();
+}
+
+// ==================== 设置 ====================
+function toggleSettings() {
+  const overlay = document.getElementById('settingsOverlay');
+  const modal = document.getElementById('settingsModal');
+  const isShow = overlay.classList.contains('show');
+  overlay.classList.toggle('show', !isShow);
+  modal.classList.toggle('show', !isShow);
+}
+
+function saveSettings() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const proxyUrl = document.getElementById('proxyUrl').value.trim();
+  const model = document.getElementById('modelSelect').value;
+  if (!proxyUrl) { showToast('请填入 API 代理地址', 'error'); return; }
+  localStorage.setItem('mindflow_apikey', apiKey);
+  localStorage.setItem('mindflow_proxy', proxyUrl);
+  localStorage.setItem('mindflow_model', model);
+  toggleSettings();
+  showToast('设置已保存', 'success');
+}
+
+// ==================== 模式切换 ====================
+function switchMode(mode, el, noReset) {
+  if (State.isProcessing) { showToast('正在处理中，请稍后再切换'); return; }
+  
+  if (!noReset) {
+    State.mode = mode;
+    State.mindmapData = null;
+    State.chatHistory = [];
+    State.transcript = '';
+    State.currentHistoryId = null;
+    State.dragOffsetX = 0;
+    State.dragOffsetY = 0;
+    document.getElementById('chatMessages').innerHTML = '';
+    document.getElementById('jsmind_container').innerHTML = '';
+    document.getElementById('placeholder').style.display = '';
+    document.getElementById('sparkList').innerHTML = '';
+    document.getElementById('meetingGoal').value = '';
+    document.getElementById('meetingGoal').classList.remove('show');
+    document.getElementById('sparkPanel').classList.remove('show');
+    document.getElementById('zoomControls').style.display = 'none';
+    State.zoomScale = 1.0;
+  } else {
+    State.mode = mode;
+  }
+
+  if (el) {
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  const title = document.getElementById('modeTitle');
+  const desc = document.getElementById('modeDesc');
+  const controls = document.getElementById('meetingControls');
+  
+  switch(mode) {
+    case 'meeting':
+      title.textContent = '会议助手'; desc.textContent = '点击麦克风开始录音，或直接输入内容。AI 会实时生成思维导图。';
+      controls.classList.add('show'); break;
+    case 'knowledge':
+      title.textContent = '知识碎片'; desc.textContent = '输入零散的知识点和灵感，AI 自动整合成结构化的知识树。';
+      controls.classList.remove('show'); break;
+    case 'article':
+      title.textContent = '文章解析'; desc.textContent = '粘贴文章内容或链接，AI 提取关键知识点并生成思维导图。';
+      controls.classList.remove('show'); break;
+  }
+
+  const placeholders = { meeting: '记录会议要点或补充内容...', knowledge: '输入碎片知识点、灵感、关键词...', article: '粘贴文章内容或链接...' };
+  document.getElementById('userInput').placeholder = placeholders[mode];
+
+  // 切换模式时刷新历史记录列表
+  renderHistoryList();
+
+  if (!noReset) showToast('已切换到' + title.textContent);
+}
+
+// ==================== 会议类型 ====================
+function setMeetingType(type, el) {
+  State.meetingType = type;
+  document.querySelectorAll('.meeting-type-btn').forEach(btn => btn.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const goalInput = document.getElementById('meetingGoal');
+  if (type === 'brainstorm') {
+    goalInput.classList.add('show');
+    document.getElementById('sparkPanel').classList.add('show');
+  } else {
+    goalInput.classList.remove('show');
+    document.getElementById('sparkPanel').classList.remove('show');
+  }
+  if (type === 'brainstorm' && goalInput.value.trim()) generateMeetingFramework(goalInput.value.trim());
+}
+
+async function generateMeetingFramework(goal) {
+  const systemPrompt = '你是资深战略顾问，擅长将会议目标拆解为结构化的思考框架。\n\n生成思维导图 JSON，格式：\n{"topic":"主题","children":[{"topic":"维度1","children":[{"topic":"核心洞察"}]}]}\n\n严格规则：\n1. 只生成 3-5 个一级分支（维度），每个分支 1-3 个子节点\n2. 节点内容必须是「观点」或「判断」，不是数据罗列\n3. 不要罗列数字、人名、日期等原始数据\n4. 用简洁有力的短语表达核心洞察（如「下沉市场是增长突破口」而非「三线城市用户占比53.6%」）\n5. 一级分支加 emoji 前缀\n6. 最多 3 层，不要更深\n7. 只输出 JSON';
+  addMessage('ai', '<div class="loading-dots"><span></span><span></span><span></span></div> 正在生成框架...');
+  const result = await callAI(systemPrompt, '会议目标：' + goal);
+  if (result) {
+    try {
+      const data = JSON.parse(result.match(/\{[\s\S]*\}/)[0]);
+      renderMindmap(data); addMessage('ai', '会议框架已生成，围绕"' + goal + '"展开。');
+      saveCurrentToHistory(goal);
+    } catch(e) { addMessage('ai', '框架生成失败，请重试。'); }
+  }
+}
+
+document.getElementById('meetingGoal').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') { e.preventDefault(); if (this.value.trim() && State.meetingType === 'brainstorm') generateMeetingFramework(this.value.trim()); }
+});
+
+// ==================== 语音识别（阿里云 Paraformer via FC 代理）====================
+const FC_PROXY = 'https://mindflow-proxy-dbyxpormng.cn-hangzhou.fcapp.run';
+const ASR_WS_PATH = '/asr';
+let ws = null;
+let audioContext = null;
+let mediaStream = null;
+let scriptProcessor = null;
+let taskId = null;
+
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
+async function toggleVoice() {
+  const btn = document.getElementById('voiceBtn');
+  const waveform = document.getElementById('voiceWaveform');
+  if (State.isRecording) {
+    // 停止录音
+    stopASR();
+    State.isRecording = false;
+    btn.classList.remove('recording');
+    btn.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
+    waveform.classList.remove('active');
+    if (State.transcript.trim()) {
+      document.getElementById('userInput').value = State.transcript.trim();
+      sendMessage();
+      State.transcript = '';
+    }
+  } else {
+    // 开始录音
+    try {
+      await startASR();
+      State.isRecording = true;
+      btn.classList.add('recording');
+      btn.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
+      waveform.classList.add('active');
+    } catch (e) {
+      showToast('启动语音识别失败：' + e.message, 'error');
+      console.error(e);
+    }
+  }
+}
+
+async function startASR() {
+  // 连接 WebSocket
+  const wsUrl = FC_PROXY + ASR_WS_PATH;
+  ws = new WebSocket(wsUrl);
+  ws.binaryType = 'arraybuffer';
+
+  await new Promise((resolve, reject) => {
+    ws.onopen = () => {
+      taskId = generateUUID();
+      const runTaskMsg = {
+        header: {
+          action: 'run-task',
+          task_id: taskId,
+          streaming: 'duplex'
+        },
+        payload: {
+          task_group: 'audio',
+          task: 'asr',
+          function: 'recognition',
+          model: 'paraformer-realtime-v2',
+          parameters: {
+            format: 'pcm',
+            sample_rate: 16000,
+            disfluency_removal_enabled: false,
+            language_hints: ['zh']
+          },
+          input: {}
+        }
+      };
+      ws.send(JSON.stringify(runTaskMsg));
+    };
+
+    ws.onmessage = (event) => {
+      if (typeof event.data === 'string') {
+        const msg = JSON.parse(event.data);
+        console.log('[ASR] 收到消息:', msg);
+        if (msg.header.event === 'task-started') {
+          console.log('[ASR] 任务已启动');
+          resolve();
+        } else if (msg.header.event === 'result-generated') {
+          console.log('[ASR] 识别结果:', msg.payload);
+          const result = msg.payload.output.sentence;
+          const text = result.text;
+          const isFinal = result.sentence_end === true;
+          console.log('[ASR] 文本:', text, '是否最终:', isFinal);
+          if (text) {
+            if (isFinal) {
+              State.transcript += text;
+            }
+            document.getElementById('userInput').value = State.transcript + (isFinal ? '' : text);
+          }
+        } else if (msg.header.event === 'task-failed') {
+          console.error('[ASR] 任务失败:', msg);
+          reject(new Error(msg.header.error_message || 'ASR failed'));
+        }
+      }
+    };
+
+    ws.onerror = (e) => reject(e);
+
+    setTimeout(() => reject(new Error('连接超时')), 10000);
+  });
+
+  // 初始化音频采集
+  audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+  mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  const source = audioContext.createMediaStreamSource(mediaStream);
+  scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1);
+  source.connect(scriptProcessor);
+  scriptProcessor.connect(audioContext.destination);
+
+  scriptProcessor.onaudioprocess = (event) => {
+    const inputData = event.inputBuffer.getChannelData(0);
+    const pcm = new Int16Array(inputData.length);
+    for (let i = 0; i < inputData.length; i++) {
+      pcm[i] = Math.max(-1, Math.min(1, inputData[i])) * 0x7fff;
+    }
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(pcm.buffer);
+    }
+  };
+}
+
+function stopASR() {
+  // 1. 先停止麦克风采集
+  if (scriptProcessor) {
+    scriptProcessor.disconnect();
+    scriptProcessor = null;
+  }
+  if (mediaStream) {
+    mediaStream.getTracks().forEach(t => t.stop());
+    mediaStream = null;
+  }
+  if (audioContext) {
+    audioContext.close();
+    audioContext = null;
+  }
+
+  // 2. 发送 finish-task，然后等阿里云把最后结果返回后再关闭 ws
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    const finishMsg = {
+      header: {
+        action: 'finish-task',
+        task_id: taskId,
+        streaming: 'duplex'
+      },
+      payload: { input: {} }
+    };
+    ws.send(JSON.stringify(finishMsg));
+
+    // 监听 task-finished 事件，收到后才关闭，最多等 5 秒
+    const closeTimer = setTimeout(() => {
+      if (ws) { ws.close(); ws = null; }
+    }, 5000);
+
+    const prevOnMsg = ws.onmessage;
+    ws.onmessage = (event) => {
+      if (prevOnMsg) prevOnMsg(event); // 继续处理识别结果
+      try {
+        const msg = JSON.parse(event.data);
+        if (msg.header && (msg.header.event === 'task-finished' || msg.header.event === 'task-failed')) {
+          clearTimeout(closeTimer);
+          if (ws) { ws.close(); ws = null; }
+        }
+      } catch(e) {}
+    };
+  }
+}
+
+// ==================== 消息处理 ====================
+function handleKeyDown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 100) + 'px'; }
+
+function addMessage(role, content, isError) {
+  const container = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg msg-' + role + (isError ? ' msg-error' : '');
+  const label = document.createElement('div');
+  label.className = 'msg-label';
+  label.textContent = role === 'ai' ? 'MINDFLOW' : 'YOU';
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+  bubble.innerHTML = content;
+  div.appendChild(label); div.appendChild(bubble);
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+  return div;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text || State.isProcessing) return;
+  State.isProcessing = true;
+  document.getElementById('sendBtn').disabled = true;
+  addMessage('user', text);
+  input.value = ''; autoResize(input);
+  switch(State.mode) {
+    case 'meeting': await processMeetingInput(text); break;
+    case 'knowledge': await processKnowledgeInput(text); break;
+    case 'article': await processArticleInput(text); break;
+  }
+  State.isProcessing = false;
+  document.getElementById('sendBtn').disabled = false;
+}
+
+// ==================== AI 调用 ====================
+async function callAI(systemPrompt, userMessage, temperature) {
+  temperature = temperature || 0.7;
+  const proxyUrl = document.getElementById('proxyUrl').value.trim();
+  const model = document.getElementById('modelSelect').value;
+  if (!proxyUrl) {
+    addMessage('ai', '⚠️ 请先点击右上角 <strong>设置</strong> 按钮，填入 API 代理地址。', true);
+    showToast('未配置代理地址', 'error'); return null;
+  }
+  const cleanUrl = proxyUrl.replace(/\/+$/, '');
+  const messages = [{ role: 'system', content: systemPrompt }];
+  messages.push(...State.chatHistory.slice(-8));
+  messages.push({ role: 'user', content: userMessage });
+
+  const loadingMsg = addMessage('ai', '<div class="loading-dots"><span></span><span></span><span></span></div> AI 思考中...');
+
+  try {
+    const response = await fetch(cleanUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model, messages, temperature }),
+    });
+
+    loadingMsg.remove();
+
+    if (!response.ok) {
+      let errMsg = '请求失败（状态码 ' + response.status + '）';
+      const errHints = { 401: '认证失败，请检查 API Key', 429: '请求频率超限，请稍候重试', 500: '服务端错误，请稍候重试', 503: '服务暂时不可用，请稍候重试' };
+      try { const errData = await response.json(); errMsg = errData.error?.message || errData.error || errMsg; } catch(e) {}
+      if (errHints[response.status]) errMsg += '（' + errHints[response.status] + '）';
+      throw new Error(errMsg);
+    }
+
+    const data = await response.json();
+    const result = data.choices?.[0]?.message?.content;
+    if (result) {
+      State.chatHistory.push({ role: 'user', content: userMessage });
+      State.chatHistory.push({ role: 'assistant', content: result });
+      if (State.chatHistory.length > 40) State.chatHistory = State.chatHistory.slice(-20);
+    }
+    return result;
+  } catch (error) {
+    if (loadingMsg.parentNode) loadingMsg.remove();
+    const friendlyErr = error.message.includes('fetch') ? '网络连接失败，请检查网络后重试' : error.message;
+    addMessage('ai', '❌ ' + friendlyErr, true);
+    return null;
+  }
+}
+
+// ==================== 会议模式 ====================
+async function processMeetingInput(text) {
+  if (!State.mindmapData) {
+    const sp = '你是资深战略顾问，擅长从会议内容中提炼核心观点和决策逻辑。\n\n格式：{"topic":"会议主题","children":[{"topic":"核心维度","children":[{"topic":"关键洞察/判断"}]}]}\n\n严格规则：\n1. 只保留 3-5 个一级分支，每个 1-3 个子节点\n2. 每个节点必须是「观点」或「结论」或「行动判断」，不要罗列原始数据\n3. 把散乱信息提炼成有逻辑的判断句（如「技术方案需重新评估」而非「张三说方案有问题」）\n4. 一级分支加 emoji 前缀\n5. 最多 3 层，不要更深\n6. 只输出 JSON';
+    const result = await callAI(sp, '会议内容：\n' + text);
+    if (result) {
+      try {
+        const data = JSON.parse(result.match(/\{[\s\S]*\}/)[0]);
+        renderMindmap(data); addMessage('ai', '✅ 会议导图已生成，继续输入会自动更新。');
+        saveCurrentToHistory(data.topic);
+      } catch(e) { addMessage('ai', '内容解析失败，请尝试更详细的描述。', true); }
+    }
+  } else {
+    const sp = '你是资深战略顾问。请将新内容提炼后整合到现有思维导图中。\n当前导图：\n' + JSON.stringify(State.mindmapData, null, 2) + '\n\n规则：\n1. 将新信息提炼为观点判断，与现有节点相关则合并，否则创建新分支\n2. 保持原有结构和 emoji 前缀\n3. 不增加超过 3 层的深度\n4. 只输出完整 JSON';
+    const result = await callAI(sp, '新增内容：\n' + text);
+    if (result) {
+      try {
+        const data = JSON.parse(result.match(/\{[\s\S]*\}/)[0]);
+        renderMindmap(data); addMessage('ai', '✅ 导图已更新。');
+        saveCurrentToHistory(data.topic);
+        if (State.meetingType === 'brainstorm') triggerBrainstorm(text);
+      } catch(e) { addMessage('ai', '更新失败，请重试。', true); }
+    }
+  }
+}
+
+// ==================== 知识碎片模式 ====================
+async function processKnowledgeInput(text) {
+  if (!State.mindmapData) {
+    const sp = '你是知识管理专家，擅长从碎片信息中提炼核心原理和底层逻辑。\n\n格式：{"topic":"知识主题","children":[{"topic":"核心原理/规律","children":[{"topic":"具体表现/推论"}]}]}\n\n严格规则：\n1. 只保留 3-5 个一级分支，每个 1-2 个子节点\n2. 每个节点必须是「概念定义」「核心原理」「因果逻辑」或「实践启示」\n3. 不要罗列表面现象，要挖掘背后的 WHY（如「反馈延迟导致行为矫正困难」而非「人们坚持不了习惯」）\n4. 一级分支加 emoji 前缀\n5. 最多 3 层，不要更深\n6. 只输出 JSON';
+    const result = await callAI(sp, '知识碎片：\n' + text);
+    if (result) {
+      try {
+        const data = JSON.parse(result.match(/\{[\s\S]*\}/)[0]);
+        renderMindmap(data); addMessage('ai', '✅ 知识树已生成，继续输入会自动整合。');
+        saveCurrentToHistory(data.topic);
+      } catch(e) { addMessage('ai', '解析失败，请重试。', true); }
+    }
+  } else {
+    const sp = '你是知识管理专家。请将新知识提炼后整合到现有知识树中。\n当前知识树：\n' + JSON.stringify(State.mindmapData, null, 2) + '\n\n规则：\n1. 将新知识提炼为原理/规律/推论，找到最合适的位置整合\n2. 不增加超过 3 层的深度\n3. 保持原有结构和 emoji 前缀\n4. 只输出完整 JSON';
+    const result = await callAI(sp, '新知识：\n' + text);
+    if (result) {
+      try {
+        const data = JSON.parse(result.match(/\{[\s\S]*\}/)[0]);
+        renderMindmap(data); addMessage('ai', '✅ 知识树已更新。');
+        saveCurrentToHistory(data.topic);
+      } catch(e) { addMessage('ai', '更新失败，请重试。', true); }
+    }
+  }
+}
+
+// ==================== 文章解析模式 ====================
+async function processArticleInput(text) {
+  if (/^https?:\/\//.test(text)) {
+    addMessage('ai', '⚠️ 目前无法直接访问链接，请复制文章正文后粘贴给我。公众号文章可以用「阅读原文」复制全文。');
+    return;
+  }
+  const sp = '你是资深分析师，擅长从文章中提炼核心论点和逻辑链条。\n\n格式：{"topic":"文章核心论点","children":[{"topic":"分论点/论据维度","children":[{"topic":"关键推论/洞察"}]}]}\n\n严格规则：\n1. 只保留 3-5 个一级分支，每个 1-2 个子节点\n2. 每个节点必须是「论点」「判断」「逻辑推理」或「核心洞察」\n3. 不要照搬原文句子，用自己的话提炼观点（如「数据驱动决策是增长的关键杠杆」而非「文中提到通过数据分析发现增长点」）\n4. 把具体案例和数据抽象为判断句，不要直接罗列\n5. 一级分支加 emoji 前缀\n6. 最多 3 层，不要更深\n7. 只输出 JSON';
+  const result = await callAI(sp, '文章内容：\n\n' + text);
+  if (result) {
+    try {
+      const data = JSON.parse(result.match(/\{[\s\S]*\}/)[0]);
+      renderMindmap(data); addMessage('ai', '✅ 文章解析完成，继续粘贴更多内容会自动关联。');
+      saveCurrentToHistory(data.topic);
+    } catch(e) { addMessage('ai', '文章解析失败，请检查内容是否完整。', true); }
+  }
+}
+
+// ==================== 思维碰撞 ====================
+async function triggerBrainstorm(context) {
+  const sp = '请基于以下内容提供 3-5 个思维方向或灵感火花，每个用 1-2 句描述。\n输出 JSON 数组：["方向1：描述", "方向2：描述"]\n只输出数组。';
+  const result = await callAI(sp, context, 0.9);
+  if (result) {
+    try {
+      const ideas = JSON.parse(result.match(/\[[\s\S]*\]/)[0]);
+      const list = document.getElementById('sparkList');
+      list.innerHTML = '';
+      ideas.forEach(idea => {
+        const item = document.createElement('div');
+        item.className = 'spark-item'; item.textContent = idea;
+        item.onclick = () => { document.getElementById('userInput').value = idea; showToast('已填入输入框'); };
+        list.appendChild(item);
+      });
+    } catch(e) {}
+  }
+}
+
+// ==================== 导图渲染（核心改进）====================
+let nodeIdCounter = 0;
+
+function buildJsMindTree(node, branchIdx, level) {
+  const id = 'n' + (nodeIdCounter++);
+  level = level || 0;
+  
+  const result = { 
+    id, 
+    topic: node.topic || '未命名',
+  };
+
+  if (level === 0) {
+    // 根节点不加额外 class
+  } else {
+    // 添加层级和分支 CSS class
+    const classes = ['level-' + Math.min(level, 5)];
+    if (level === 5) classes.push('level-deep');
+    if (branchIdx !== undefined) {
+      classes.push('branch-' + (branchIdx % 8));
+    }
+    result['class'] = classes.join(' ');
+  }
+
+  if (node.children && node.children.length > 0) {
+    result.children = node.children.map((c, i) => buildJsMindTree(c, level === 0 ? i : branchIdx, level + 1));
+  }
+  return result;
+}
+
+function renderMindmap(data) {
+  const container = document.getElementById('jsmind_container');
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('zoomControls').style.display = 'flex';
+  State.mindmapData = data;
+  State.dragOffsetX = 0;
+  State.dragOffsetY = 0;
+
+  if (State.jm) { try { State.jm = null; } catch(e) {} container.innerHTML = ''; }
+
+  nodeIdCounter = 0;
+  const mindData = {
+    meta: { name: 'mindflow', author: 'user', version: '0.3' },
+    format: 'node_tree',
+    data: buildJsMindTree(data)
+  };
+
+  State.jm = new jsMind({
+    container: 'jsmind_container',
+    editable: true,
+    theme: 'primary',
+    view: { 
+      engine: 'canvas', 
+      hmargin: 120,   // 增大水平边距 - 呼吸感
+      vmargin: 60,    // 增大垂直边距
+      line_width: 2,  // 连线加粗
+      line_color: 'rgba(255,255,255,0.06)',
+    },
+    layout: { 
+      hspace: 40,     // 水平间距加大 - 呼吸感
+      vspace: 24,     // 垂直间距加大
+      pspace: 16,     // 父子节点间距加大
+    },
+  });
+  State.jm.show(mindData);
+  State.zoomScale = 1.0;
+  document.getElementById('zoomLevel').textContent = '100%';
+
+  // 渲染后给节点应用分支颜色的连线
+  setTimeout(() => applyBranchLineColors(), 100);
+
+  State.jm.add_event_listener(function(type, node) {
+    if (type === 'edit_end') {
+      // 用户手动编辑后同步数据
+    }
+  });
+}
+
+// 给不同分支的连线着色（通过 canvas 绘制后处理）
+function applyBranchLineColors() {
+  try {
+    const container = document.getElementById('jsmind_container');
+    const nodes = container.querySelectorAll('jmnode');
+    nodes.forEach(node => {
+      // 节点 hover 效果增强
+      node.style.cursor = 'pointer';
+    });
+
+    // 给一级节点的连线区域添加颜色标识
+    const level1Nodes = container.querySelectorAll('jmnode.branch-0.level-1, jmnode.branch-1.level-1, jmnode.branch-2.level-1, jmnode.branch-3.level-1, jmnode.branch-4.level-1, jmnode.branch-5.level-1, jmnode.branch-6.level-1, jmnode.branch-7.level-1');
+    level1Nodes.forEach(node => {
+      // 已经通过 CSS 实现了边框颜色
+      node.style.transition = 'all 0.15s ease';
+    });
+  } catch(e) {}
+}
+
+// ==================== 清空 ====================
+function clearAll() {
+  if (!confirm('清空当前内容？历史记录不会删除，可以随时恢复。')) return;
+  State.mindmapData = null; State.chatHistory = []; State.transcript = ''; State.currentHistoryId = null;
+  State.dragOffsetX = 0; State.dragOffsetY = 0;
+  document.getElementById('chatMessages').innerHTML = '';
+  document.getElementById('jsmind_container').innerHTML = '';
+  document.getElementById('placeholder').style.display = '';
+  document.getElementById('sparkList').innerHTML = '';
+  document.getElementById('zoomControls').style.display = 'none';
+  State.zoomScale = 1.0;
+  showToast('已清空当前内容');
+}
+
+// ==================== Toast ====================
+function showToast(msg, type) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = 'toast' + (type === 'error' ? ' toast-error' : type === 'success' ? ' toast-success' : '');
+  toast.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+// ==================== 启动 ====================
+init();
+</script>
+</body>
+</html>

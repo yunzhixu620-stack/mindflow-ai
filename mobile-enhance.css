@@ -1,0 +1,253 @@
+/* ================================================================ */
+/* ===== 移动端响应式增强 (新增) ===== */
+/* ================================================================ */
+
+@media (max-width: 768px) {
+  /* 整体布局调整 */
+  .main { flex-direction: column; }
+  
+  /* 侧边栏改为可折叠面板 */
+  .sidebar { 
+    width: 100%; 
+    min-width: auto; 
+    height: 60%; /* 给导图留更多空间 */
+    position: relative;
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar.collapsed {
+    transform: translateY(calc(100% - 50px)); /* 只露出顶部一点 */
+  }
+  
+  /* 折叠时隐藏历史记录和输入区，只保留头部 */
+  .sidebar.collapsed .history-section,
+  .sidebar.collapsed .input-area {
+    display: none;
+  }
+  
+  /* 折叠时头部样式调整 */
+  .sidebar.collapsed .sidebar-header {
+    padding: 8px 10px;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  
+  /* 折叠时隐藏描述文字 */
+  .sidebar.collapsed #modeDesc {
+    display: none;
+  }
+  
+  /* 折叠时标题居中 */
+  .sidebar.collapsed .sidebar-header > div {
+    justify-content: center;
+  }
+  
+  /* 思维导图区域占满剩余空间 */
+  .mindmap-area { 
+    height: 40%; 
+    min-height: 300px;
+  }
+  
+  /* 顶部导航优化 */
+  .topbar {
+    padding: 0 10px;
+    height: 44px; /* 稍微降低高度 */
+  }
+  
+  .logo { font-size: 13px; }
+  .logo-icon { width: 18px; height: 18px; }
+  
+  /* 模式标签简化 */
+  .mode-tabs {
+    display: none; /* 手机上隐藏模式切换，减少拥挤 */
+  }
+  
+  /* 右侧按钮加大 */
+  .btn-icon {
+    width: 36px; 
+    height: 36px;
+  }
+  .btn-icon svg { width: 18px; height: 18px; }
+  
+  /* 侧边栏头部 */
+  .sidebar-header {
+    padding: 10px;
+  }
+  .sidebar-header h3 { font-size: 14px; }
+  .sidebar-header p { font-size: 11px; }
+  
+  /* 历史记录区优化 */
+  .history-section {
+    max-height: 120px; /* 限制高度 */
+  }
+  .history-item {
+    padding: 6px 10px;
+  }
+  .history-item-icon {
+    width: 24px; height: 24px;
+    font-size: 12px;
+  }
+  .history-item-title { font-size: 12px; }
+  .history-item-meta { font-size: 10px; }
+  
+  /* 会议控制按钮优化 */
+  .meeting-controls {
+    padding: 6px 10px;
+  }
+  .meeting-type-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .meeting-goal {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+  
+  /* 聊天消息区优化 */
+  .chat-messages {
+    padding-right: 2px;
+  }
+  .msg { margin-bottom: 10px; }
+  .msg-bubble {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  
+  /* 输入框优化 */
+  .input-box {
+    padding-top: 8px;
+    gap: 4px;
+  }
+  .input-box textarea {
+    font-size: 14px; /* 防止 iOS 自动缩放 */
+    padding: 8px 10px;
+    min-height: 36px;
+  }
+  .btn-send, .voice-btn {
+    width: 40px; 
+    height: 40px;
+  }
+  .btn-send svg, .voice-btn svg {
+    width: 18px; height: 18px;
+  }
+  
+  /* 空状态引导优化 */
+  .mindmap-placeholder {
+    width: 90%;
+    padding: 10px;
+  }
+  .placeholder-icon {
+    width: 48px; height: 48px;
+    margin-bottom: 12px;
+  }
+  .placeholder-icon svg { width: 24px; height: 24px; }
+  .mindmap-placeholder h4 { font-size: 14px; }
+  .mindmap-placeholder p { font-size: 11px; }
+  .placeholder-tip {
+    padding: 8px 10px;
+    margin-bottom: 6px;
+  }
+  .placeholder-tip-icon { font-size: 14px; }
+  .placeholder-tip-text { font-size: 11px; }
+  
+  /* 缩放控件优化 */
+  .zoom-controls {
+    bottom: 10px; right: 10px;
+  }
+  .zoom-btn {
+    width: 36px; height: 36px;
+    font-size: 18px;
+  }
+  .zoom-btn svg { width: 16px; height: 16px; }
+  
+  /* 思维碰撞面板优化 */
+  .spark-panel {
+    width: calc(100% - 20px);
+    max-height: 200px;
+    right: 10px; top: 50px;
+  }
+  .spark-item {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+  
+  /* 右键菜单优化 */
+  .node-context-menu {
+    min-width: 160px;
+  }
+  .node-context-menu button {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  .node-context-menu button svg {
+    width: 16px; height: 16px;
+  }
+  
+  /* 设置模态框优化 */
+  .settings-modal {
+    width: calc(100% - 40px);
+    padding: 20px;
+  }
+  .setting-group input, .setting-group select {
+    font-size: 14px;
+    padding: 10px;
+  }
+  
+  /* Toast 优化 */
+  .toast {
+    left: 50%;
+    transform: translateX(-50%) translateY(70px);
+    max-width: 90%;
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+}
+
+/* 超小屏幕（iPhone SE 等） */
+@media (max-width: 375px) {
+  .sidebar { height: 65%; }
+  .mindmap-area { height: 35%; }
+  
+  .logo { font-size: 12px; }
+  .mode-tab { padding: 4px 8px; font-size: 11px; }
+  
+  .btn-icon { width: 32px; height: 32px; }
+  
+  .msg-bubble { font-size: 12px; }
+  .input-box textarea { font-size: 13px; }
+}
+
+/* 横屏模式优化 */
+@media (max-width: 768px) and (orientation: landscape) {
+  .sidebar { 
+    height: 100%; 
+    width: 60%; /* 横屏时侧边栏占左边 */
+    transform: none;
+  }
+  .sidebar.collapsed {
+    transform: translateX(calc(-100% + 60px));
+  }
+  .mindmap-area { 
+    height: 100%; 
+    width: 40%;
+  }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+  /* 加大所有可点击元素 */
+  .btn-icon, .btn-send, .voice-btn, .zoom-btn, .mode-tab {
+    min-height: 44px; /* iOS 推荐最小点击区域 */
+  }
+  
+  /* 移除 hover 效果（触摸设备没有 hover） */
+  .mode-tab:hover, .btn-icon:hover {
+    background: none;
+  }
+  
+  /* 节点点击区域加大 */
+  jmnode {
+    min-height: 30px;
+    min-width: 60px;
+  }
+}
